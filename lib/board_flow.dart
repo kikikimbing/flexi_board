@@ -9,6 +9,7 @@ export 'src/defaults/default_tab.dart';
 export 'src/models/board.dart';
 export 'src/models/card.dart';
 export 'src/models/column.dart';
+export 'src/models/drag_events.dart';
 export 'src/models/move.dart';
 export 'src/models/swimlane.dart';
 export 'src/models/workspace.dart';

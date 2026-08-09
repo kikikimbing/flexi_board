@@ -48,17 +48,22 @@ BoardFlow<String>(
 
 ## Custom cards + any state management
 
-Own the workspace yourself and apply moves in `onCardMoved`:
+Own the workspace yourself and apply moves in `onDrop` or `onCardMoved`:
 
 ```dart
 BoardFlow<Task>(
   workspace: myWorkspace,
   layout: BoardFlowLayout.tabs,
   cardBuilder: (context, card, details) => MyTaskTile(task: card.data),
-  onCardMoved: (move) {
-    setState(() => myWorkspace = myWorkspace.applyMove(move));
-    // or dispatch to Bloc / Riverpod / etc.
+  onDrag: (details) {
+    // started | updated | cancelled
   },
+  onDrop: (details) {
+    if (!details.accepted || details.move == null) return;
+    setState(() => myWorkspace = myWorkspace.applyMove(details.move!));
+  },
+  // Or keep using onCardMoved for accepted moves only:
+  // onCardMoved: (move) => setState(() => myWorkspace = myWorkspace.applyMove(move)),
 );
 ```
 

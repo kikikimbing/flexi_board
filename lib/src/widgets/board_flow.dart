@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import '../controller/board_flow_controller.dart';
 import '../defaults/board_flow_theme.dart';
 import '../defaults/default_card.dart';
+import '../models/drag_events.dart';
 import '../models/move.dart';
 import '../models/workspace.dart';
 import '../physics/board_flow_physics.dart';
@@ -35,6 +36,8 @@ class BoardFlow<T> extends StatefulWidget {
     this.boardTabBuilder,
     this.emptyColumnBuilder,
     this.swimlaneHeaderBuilder,
+    this.onDrag,
+    this.onDrop,
     this.onCardMoved,
     this.onColumnReordered,
     this.onActiveBoardChanged,
@@ -62,6 +65,13 @@ class BoardFlow<T> extends StatefulWidget {
   final BoardFlowEmptyColumnBuilder<T>? emptyColumnBuilder;
   final BoardFlowSwimlaneHeaderBuilder<T>? swimlaneHeaderBuilder;
 
+  /// Drag lifecycle: [BoardFlowDragPhase.started] / [BoardFlowDragPhase.updated].
+  final BoardFlowDragCallback<T>? onDrag;
+
+  /// Drop result: accepted move or cancelled / rejected / no-op.
+  final BoardFlowDropCallback<T>? onDrop;
+
+  /// Fired only when a drop is accepted (same move as [onDrop] when accepted).
   final ValueChanged<BoardFlowMove<T>>? onCardMoved;
   final ValueChanged<BoardFlowColumnReorder>? onColumnReordered;
   final ValueChanged<String>? onActiveBoardChanged;
@@ -81,6 +91,11 @@ class _BoardFlowState<T> extends State<BoardFlow<T>> {
   String? _pendingTabBoardId;
   String? _hoveredTabBoardId;
   String? _localActiveBoardId;
+
+  bool _wasDragging = false;
+  String? _lastHoverBoardId;
+  String? _lastHoverColumnId;
+  int? _lastHoverIndex;
 
   BoardFlowWorkspace<T> get _workspace {
     if (widget.controller != null) return widget.controller!.workspace;
@@ -135,9 +150,30 @@ class _BoardFlowState<T> extends State<BoardFlow<T>> {
 
   void _onDragSessionChanged() {
     if (_dragSession.active) {
+      if (!_wasDragging) {
+        _wasDragging = true;
+        _lastHoverBoardId = _dragSession.hoverBoardId;
+        _lastHoverColumnId = _dragSession.hoverColumnId;
+        _lastHoverIndex = _dragSession.hoverIndex;
+        _emitDrag(BoardFlowDragPhase.started);
+      } else {
+        final hoverChanged = _dragSession.hoverBoardId != _lastHoverBoardId ||
+            _dragSession.hoverColumnId != _lastHoverColumnId ||
+            _dragSession.hoverIndex != _lastHoverIndex;
+        if (hoverChanged) {
+          _lastHoverBoardId = _dragSession.hoverBoardId;
+          _lastHoverColumnId = _dragSession.hoverColumnId;
+          _lastHoverIndex = _dragSession.hoverIndex;
+          _emitDrag(BoardFlowDragPhase.updated);
+        }
+      }
       _ensureOverlay();
       _overlayEntry?.markNeedsBuild();
     } else {
+      _wasDragging = false;
+      _lastHoverBoardId = null;
+      _lastHoverColumnId = null;
+      _lastHoverIndex = null;
       _removeOverlay();
       _tabSwitchTimer?.cancel();
       _pendingTabBoardId = null;
@@ -145,6 +181,35 @@ class _BoardFlowState<T> extends State<BoardFlow<T>> {
         setState(() => _hoveredTabBoardId = null);
       }
     }
+  }
+
+  void _emitDrag(BoardFlowDragPhase phase) {
+    final callback = widget.onDrag;
+    if (callback == null) return;
+    final cardId = _dragSession.cardId;
+    if (cardId == null ||
+        _dragSession.fromBoardId == null ||
+        _dragSession.fromColumnId == null ||
+        _dragSession.fromIndex == null ||
+        _dragSession.globalPosition == null) {
+      return;
+    }
+    final card = findCardInWorkspace<T>(_workspace.boards, cardId);
+    if (card == null) return;
+    callback(
+      BoardFlowDragDetails<T>(
+        phase: phase,
+        card: card,
+        boardId: _dragSession.fromBoardId!,
+        columnId: _dragSession.fromColumnId!,
+        index: _dragSession.fromIndex!,
+        globalPosition: _dragSession.globalPosition!,
+        hoverBoardId: _dragSession.hoverBoardId,
+        hoverColumnId: _dragSession.hoverColumnId,
+        hoverIndex: _dragSession.hoverIndex,
+        rejected: _dragSession.rejected,
+      ),
+    );
   }
 
   void _ensureOverlay() {
@@ -166,7 +231,8 @@ class _BoardFlowState<T> extends State<BoardFlow<T>> {
       return const SizedBox.shrink();
     }
 
-    final card = findCardInWorkspace<T>(_workspace.boards, _dragSession.cardId!);
+    final card =
+        findCardInWorkspace<T>(_workspace.boards, _dragSession.cardId!);
     if (card == null) return const SizedBox.shrink();
 
     final theme = widget.theme ?? BoardFlowTheme.fromContext(context);
@@ -186,9 +252,8 @@ class _BoardFlowState<T> extends State<BoardFlow<T>> {
     final useSnap = widget.physics.snapFeedbackToPlaceholder &&
         _dragSession.snapAnchor != null &&
         _dragSession.snappedToForeignBoard;
-    final left = useSnap
-        ? _dragSession.snapAnchor!.dx
-        : pos.dx - size.width / 2;
+    final left =
+        useSnap ? _dragSession.snapAnchor!.dx : pos.dx - size.width / 2;
     final top = useSnap ? _dragSession.snapAnchor!.dy : pos.dy - 20;
 
     return Positioned(
@@ -217,7 +282,6 @@ class _BoardFlowState<T> extends State<BoardFlow<T>> {
     widget.controller?.setActiveBoard(boardId);
     widget.onActiveBoardChanged?.call(boardId);
     if (_dragSession.active && widget.physics.snapOnBoardEnter) {
-      // After the new board paints, snap to its nearest/first column.
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!mounted || !_dragSession.active) return;
         final pos = _dragSession.globalPosition;
@@ -269,31 +333,105 @@ class _BoardFlowState<T> extends State<BoardFlow<T>> {
 
   void _commitDrop() {
     _dropRegistry.stopAll();
+    final cardId = _dragSession.cardId;
+    final fromBoardId = _dragSession.fromBoardId;
+    final fromColumnId = _dragSession.fromColumnId;
+    final fromIndex = _dragSession.fromIndex;
+    final pos = _dragSession.globalPosition ?? Offset.zero;
+    final card = cardId == null
+        ? null
+        : findCardInWorkspace<T>(_workspace.boards, cardId);
     final move = buildMoveFromSession<T>(
       workspace: _workspace,
       session: _dragSession,
     );
     _dragSession.end();
 
-    if (move == null) return;
-    if (!_policies.accepts(move, _workspace)) return;
-    if (move.fromBoardId == move.toBoardId &&
-        move.fromColumnId == move.toColumnId &&
-        move.fromIndex == move.toIndex) {
+    if (card == null) return;
+
+    final accepted = move != null &&
+        _policies.accepts(move, _workspace) &&
+        !(move.fromBoardId == move.toBoardId &&
+            move.fromColumnId == move.toColumnId &&
+            move.fromIndex == move.toIndex);
+
+    if (!accepted) {
+      widget.onDrag?.call(
+        BoardFlowDragDetails<T>(
+          phase: BoardFlowDragPhase.cancelled,
+          card: card,
+          boardId: fromBoardId ?? move?.fromBoardId ?? '',
+          columnId: fromColumnId ?? move?.fromColumnId ?? '',
+          index: fromIndex ?? move?.fromIndex ?? 0,
+          globalPosition: pos,
+        ),
+      );
+      widget.onDrop?.call(
+        BoardFlowDropDetails<T>(
+          card: card,
+          accepted: false,
+          move: null,
+        ),
+      );
       return;
     }
 
     if (widget.controller != null) {
       widget.controller!.moveCard(move);
     }
+    widget.onDrop?.call(
+      BoardFlowDropDetails<T>(
+        card: card,
+        accepted: true,
+        move: move,
+      ),
+    );
     widget.onCardMoved?.call(move);
+  }
+
+  void _cancelDrag() {
+    _dropRegistry.stopAll();
+    final cardId = _dragSession.cardId;
+    final card = cardId == null
+        ? null
+        : findCardInWorkspace<T>(_workspace.boards, cardId);
+    final fromBoardId = _dragSession.fromBoardId;
+    final fromColumnId = _dragSession.fromColumnId;
+    final fromIndex = _dragSession.fromIndex;
+    final pos = _dragSession.globalPosition ?? Offset.zero;
+    _dragSession.end();
+
+    if (card == null ||
+        fromBoardId == null ||
+        fromColumnId == null ||
+        fromIndex == null) {
+      return;
+    }
+
+    widget.onDrag?.call(
+      BoardFlowDragDetails<T>(
+        phase: BoardFlowDragPhase.cancelled,
+        card: card,
+        boardId: fromBoardId,
+        columnId: fromColumnId,
+        index: fromIndex,
+        globalPosition: pos,
+      ),
+    );
+    widget.onDrop?.call(
+      BoardFlowDropDetails<T>(
+        card: card,
+        accepted: false,
+        move: null,
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = widget.theme ?? BoardFlowTheme.fromContext(context);
 
-    Widget body = BoardFlowScope<T>(
+    final body = BoardFlowScope<T>(
       workspace: _workspace,
       physics: widget.physics,
       policies: _policies,
@@ -348,8 +486,7 @@ class _BoardFlowState<T> extends State<BoardFlow<T>> {
             event.pointer != _dragSession.pointerId) {
           return;
         }
-        _dragSession.end();
-        _dropRegistry.stopAll();
+        _cancelDrag();
       },
       child: CompositedTransformTarget(
         link: _overlayLink,

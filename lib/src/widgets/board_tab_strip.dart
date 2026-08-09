@@ -65,12 +65,16 @@ class BoardTabStripHit<T> extends StatelessWidget {
                 selected: selected,
                 dragHover: dragHover,
                 theme: scope.theme,
-                onTap: () => scope.requestActiveBoard(board.id),
               );
 
+          // Always own selection taps so custom tab builders stay visual-only.
           return KeyedSubtree(
             key: registry.keyFor(board.id),
-            child: tab,
+            child: GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: () => scope.requestActiveBoard(board.id),
+              child: tab,
+            ),
           );
         },
       ),

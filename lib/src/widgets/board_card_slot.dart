@@ -108,10 +108,7 @@ class _BoardCardSlotState<T> extends State<BoardCardSlot<T>> {
           setState(() => _dragging = false);
         }
       },
-      child: Opacity(
-        opacity: isGhost ? 0.3 : 1,
-        child: KeyedSubtree(key: _key, child: child),
-      ),
+      child: KeyedSubtree(key: _key, child: child),
     );
   }
 }

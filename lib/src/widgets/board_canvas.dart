@@ -52,6 +52,11 @@ class BoardCanvasState<T> extends State<BoardCanvas<T>> {
 
   @override
   void dispose() {
+    widget.dropRegistry?.unregisterBoard(
+      widget.boardId,
+      handler: handlePointer,
+      stopScrolling: stopScrolling,
+    );
     _scroller?.dispose();
     _scrollController.dispose();
     super.dispose();
@@ -61,6 +66,7 @@ class BoardCanvasState<T> extends State<BoardCanvas<T>> {
       _columnKeys.putIfAbsent(id, GlobalKey<BoardColumnViewState<T>>.new);
 
   void handlePointer(Offset global) {
+    if (!mounted) return;
     final scope = BoardFlowScope.of<T>(context);
     final session = scope.dragSession;
     if (!session.active) return;
@@ -125,6 +131,7 @@ class BoardCanvasState<T> extends State<BoardCanvas<T>> {
   }
 
   void stopScrolling() {
+    if (!mounted) return;
     _scroller?.stop();
     for (final key in _columnKeys.values) {
       key.currentState?.stopScrolling();
@@ -241,14 +248,30 @@ class DropRegistry<T> {
     _stoppers[boardId] = stopScrolling;
   }
 
+  /// Removes a board's handlers only if they still match [handler] /
+  /// [stopScrolling], so a newer canvas for the same id is not cleared.
+  void unregisterBoard(
+    String boardId, {
+    required void Function(Offset) handler,
+    required VoidCallback stopScrolling,
+  }) {
+    if (identical(_handlers[boardId], handler)) {
+      _handlers.remove(boardId);
+    }
+    if (identical(_stoppers[boardId], stopScrolling)) {
+      _stoppers.remove(boardId);
+    }
+  }
+
   void handlePointer(Offset global) {
-    for (final handler in _handlers.values) {
+    // Snapshot values in case a handler mutates the map.
+    for (final handler in List<void Function(Offset)>.of(_handlers.values)) {
       handler(global);
     }
   }
 
   void stopAll() {
-    for (final stop in _stoppers.values) {
+    for (final stop in List<VoidCallback>.of(_stoppers.values)) {
       stop();
     }
   }

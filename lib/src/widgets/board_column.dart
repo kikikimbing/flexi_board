@@ -33,7 +33,7 @@ class BoardColumnViewState<T> extends State<BoardColumnView<T>> {
   final ScrollController _scrollController = ScrollController();
   final GlobalKey _listKey = GlobalKey();
   EdgeAutoScroller? _scroller;
-  final Map<int, GlobalKey> _itemKeys = {};
+  final Map<String, GlobalKey> _itemKeys = {};
 
   @override
   void didChangeDependencies() {
@@ -54,15 +54,21 @@ class BoardColumnViewState<T> extends State<BoardColumnView<T>> {
     super.dispose();
   }
 
-  GlobalKey _keyFor(int index) =>
-      _itemKeys.putIfAbsent(index, GlobalKey.new);
+  GlobalKey _keyForCard(String cardId) =>
+      _itemKeys.putIfAbsent(cardId, GlobalKey.new);
 
-  List<double> _itemCenters(BuildContext listContext) {
+  /// Centers of cards still visible in the list (excludes the in-flight card).
+  List<double> _itemCenters(
+    BuildContext listContext, {
+    String? excludeCardId,
+  }) {
     final listBox = listContext.findRenderObject() as RenderBox?;
     if (listBox == null) return const [];
     final centers = <double>[];
-    for (var i = 0; i < widget.cards.length; i++) {
-      final box = _keyFor(i).currentContext?.findRenderObject() as RenderBox?;
+    for (final card in widget.cards) {
+      if (excludeCardId != null && card.id == excludeCardId) continue;
+      final box =
+          _keyForCard(card.id).currentContext?.findRenderObject() as RenderBox?;
       if (box == null || !box.hasSize) continue;
       final topLeft = box.localToGlobal(Offset.zero, ancestor: listBox);
       centers.add(topLeft.dy + box.size.height / 2);
@@ -87,6 +93,7 @@ class BoardColumnViewState<T> extends State<BoardColumnView<T>> {
     bool forceTopSlot = false,
     bool forceInside = false,
   }) {
+    if (!mounted) return;
     final scope = BoardFlowScope.of<T>(context);
     final session = scope.dragSession;
     if (!session.active || session.cardId == null) return;
@@ -115,15 +122,18 @@ class BoardColumnViewState<T> extends State<BoardColumnView<T>> {
           : listBox.globalToLocal(global);
       final sameColumn = session.fromBoardId == widget.boardId &&
           session.fromColumnId == widget.column.id;
-      final centers = _itemCenters(listContext);
+      // Collapse the source card in-layout; centers are only remaining cards.
+      final excludeId = sameColumn ? session.cardId : null;
+      final centers = _itemCenters(listContext, excludeCardId: excludeId);
+      final visibleCount = excludeId == null
+          ? widget.cards.length
+          : (widget.cards.length - 1).clamp(0, widget.cards.length);
       index = forceTopSlot
           ? 0
           : computeInsertIndex(
               localY: local.dy,
               itemCenters: centers,
-              itemCount: widget.cards.length,
-              draggingFromIndex: session.fromIndex,
-              sameColumn: sameColumn,
+              itemCount: visibleCount,
             );
 
       final listOrigin = listBox.localToGlobal(Offset.zero);
@@ -267,7 +277,14 @@ class BoardColumnViewState<T> extends State<BoardColumnView<T>> {
     final scope = BoardFlowScope.of<T>(context);
     final theme = scope.theme;
     final scheme = Theme.of(context).colorScheme;
+    final session = scope.dragSession;
     final children = <Widget>[];
+
+    final draggingFromThisColumn = session.active &&
+        session.fromBoardId == widget.boardId &&
+        session.fromColumnId == widget.column.id;
+    final draggingCardId =
+        draggingFromThisColumn ? session.cardId : null;
 
     if (widget.cards.isEmpty && !showPlaceholder) {
       children.add(
@@ -303,26 +320,48 @@ class BoardColumnViewState<T> extends State<BoardColumnView<T>> {
       );
     }
 
+    // Remaining cards with the in-flight card removed so the list collapses
+    // and the placeholder (not a faded first card) is the drop shadow.
+    final visibleCards = <(int index, BoardFlowCard<T> card)>[];
     for (var i = 0; i < widget.cards.length; i++) {
-      if (showPlaceholder && placeholderIndex == i) {
-        addPlaceholder();
-      }
       final card = widget.cards[i];
+      if (draggingCardId != null && card.id == draggingCardId) continue;
+      visibleCards.add((i, card));
+    }
+
+    if (visibleCards.isEmpty && !showPlaceholder) {
+      children.add(
+        scope.emptyColumnBuilder?.call(context, widget.column) ??
+            const SizedBox.shrink(),
+      );
+      return children;
+    }
+
+    var placeholderInserted = false;
+    for (var visual = 0; visual < visibleCards.length; visual++) {
+      if (showPlaceholder && placeholderIndex == visual) {
+        addPlaceholder();
+        placeholderInserted = true;
+      }
+      final entry = visibleCards[visual];
+      final card = entry.$2;
+      final dataIndex = entry.$1;
       children.add(
         Padding(
-          key: _keyFor(i),
+          key: _keyForCard(card.id),
           padding: EdgeInsets.only(bottom: scope.physics.cardSpacing),
           child: BoardCardSlot<T>(
             boardId: widget.boardId,
             columnId: widget.column.id,
-            index: i,
+            index: dataIndex,
             card: card,
           ),
         ),
       );
     }
 
-    if (showPlaceholder && placeholderIndex >= widget.cards.length) {
+    if (showPlaceholder &&
+        (!placeholderInserted || placeholderIndex >= visibleCards.length)) {
       addPlaceholder();
     }
 
