@@ -2,8 +2,8 @@ import 'column.dart';
 import 'swimlane.dart';
 
 /// A single board containing columns (and optional swimlanes).
-class BoardFlowBoard<T> {
-  const BoardFlowBoard({
+class FlexiBoardBoard<T> {
+  const FlexiBoardBoard({
     required this.id,
     required this.title,
     this.columns = const [],
@@ -12,23 +12,23 @@ class BoardFlowBoard<T> {
 
   final String id;
   final String title;
-  final List<BoardFlowColumn<T>> columns;
-  final List<BoardFlowSwimlane<T>> swimlanes;
+  final List<FlexiBoardColumn<T>> columns;
+  final List<FlexiBoardSwimlane<T>> swimlanes;
 
-  BoardFlowColumn<T>? columnById(String columnId) {
+  FlexiBoardColumn<T>? columnById(String columnId) {
     for (final column in columns) {
       if (column.id == columnId) return column;
     }
     return null;
   }
 
-  BoardFlowBoard<T> copyWith({
+  FlexiBoardBoard<T> copyWith({
     String? id,
     String? title,
-    List<BoardFlowColumn<T>>? columns,
-    List<BoardFlowSwimlane<T>>? swimlanes,
+    List<FlexiBoardColumn<T>>? columns,
+    List<FlexiBoardSwimlane<T>>? swimlanes,
   }) {
-    return BoardFlowBoard<T>(
+    return FlexiBoardBoard<T>(
       id: id ?? this.id,
       title: title ?? this.title,
       columns: columns ?? this.columns,
@@ -38,7 +38,7 @@ class BoardFlowBoard<T> {
 
   @override
   bool operator ==(Object other) {
-    return other is BoardFlowBoard<T> &&
+    return other is FlexiBoardBoard<T> &&
         other.id == id &&
         other.title == title &&
         _listEquals(other.columns, columns) &&

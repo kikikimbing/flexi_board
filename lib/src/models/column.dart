@@ -1,8 +1,8 @@
 import 'card.dart';
 
 /// A column (lane) within a board.
-class BoardFlowColumn<T> {
-  const BoardFlowColumn({
+class FlexiBoardColumn<T> {
+  const FlexiBoardColumn({
     required this.id,
     required this.title,
     this.cards = const [],
@@ -12,7 +12,7 @@ class BoardFlowColumn<T> {
 
   final String id;
   final String title;
-  final List<BoardFlowCard<T>> cards;
+  final List<FlexiBoardCard<T>> cards;
 
   /// When set, dropping into this column is rejected if at/over capacity
   /// (unless policies disable WIP checks).
@@ -35,15 +35,15 @@ class BoardFlowColumn<T> {
     return cards.length >= limit;
   }
 
-  BoardFlowColumn<T> copyWith({
+  FlexiBoardColumn<T> copyWith({
     String? id,
     String? title,
-    List<BoardFlowCard<T>>? cards,
+    List<FlexiBoardCard<T>>? cards,
     int? wipLimit,
     int? color,
     bool clearWipLimit = false,
   }) {
-    return BoardFlowColumn<T>(
+    return FlexiBoardColumn<T>(
       id: id ?? this.id,
       title: title ?? this.title,
       cards: cards ?? this.cards,
@@ -54,7 +54,7 @@ class BoardFlowColumn<T> {
 
   @override
   bool operator ==(Object other) {
-    return other is BoardFlowColumn<T> &&
+    return other is FlexiBoardColumn<T> &&
         other.id == id &&
         other.title == title &&
         other.wipLimit == wipLimit &&

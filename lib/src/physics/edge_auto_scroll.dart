@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/widgets.dart';
 
-import 'board_flow_physics.dart';
+import 'flexi_board_physics.dart';
 
 /// Scrolls a [ScrollController] when the pointer is near an edge.
 class EdgeAutoScroller {
@@ -13,7 +13,7 @@ class EdgeAutoScroller {
   });
 
   final ScrollController controller;
-  final BoardFlowPhysics physics;
+  final FlexiBoardPhysics physics;
   final Axis axis;
 
   Timer? _timer;

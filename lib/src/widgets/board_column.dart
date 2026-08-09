@@ -7,7 +7,7 @@ import '../models/move.dart';
 import '../physics/edge_auto_scroll.dart';
 import '../physics/hit_testing.dart';
 import 'board_card_slot.dart';
-import 'board_flow_scope.dart';
+import 'flexi_board_scope.dart';
 
 class BoardColumnView<T> extends StatefulWidget {
   const BoardColumnView({
@@ -20,8 +20,8 @@ class BoardColumnView<T> extends StatefulWidget {
   });
 
   final String boardId;
-  final BoardFlowColumn<T> column;
-  final List<BoardFlowCard<T>> cards;
+  final FlexiBoardColumn<T> column;
+  final List<FlexiBoardCard<T>> cards;
   final int columnIndex;
   final String? swimlaneId;
 
@@ -38,7 +38,7 @@ class BoardColumnViewState<T> extends State<BoardColumnView<T>> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final scope = BoardFlowScope.of<T>(context);
+    final scope = FlexiBoardScope.of<T>(context);
     _scroller?.dispose();
     _scroller = EdgeAutoScroller(
       controller: _scrollController,
@@ -76,7 +76,7 @@ class BoardColumnViewState<T> extends State<BoardColumnView<T>> {
     return centers;
   }
 
-  BoardFlowCard<T>? _findCard(BoardFlowScope<T> scope, String cardId) {
+  FlexiBoardCard<T>? _findCard(FlexiBoardScope<T> scope, String cardId) {
     for (final board in scope.workspace.boards) {
       for (final column in board.columns) {
         for (final card in column.cards) {
@@ -94,7 +94,7 @@ class BoardColumnViewState<T> extends State<BoardColumnView<T>> {
     bool forceInside = false,
   }) {
     if (!mounted) return;
-    final scope = BoardFlowScope.of<T>(context);
+    final scope = FlexiBoardScope.of<T>(context);
     final session = scope.dragSession;
     if (!session.active || session.cardId == null) return;
 
@@ -152,7 +152,7 @@ class BoardColumnViewState<T> extends State<BoardColumnView<T>> {
     final realCard = _findCard(scope, session.cardId!);
     var rejected = false;
     if (realCard != null) {
-      final move = BoardFlowMove<T>(
+      final move = FlexiBoardMove<T>(
         card: realCard,
         fromBoardId: session.fromBoardId!,
         toBoardId: widget.boardId,
@@ -181,7 +181,7 @@ class BoardColumnViewState<T> extends State<BoardColumnView<T>> {
 
   void stopScrolling() => _scroller?.stop();
 
-  void _startColumnReorder(BoardFlowScope<T> scope) {
+  void _startColumnReorder(FlexiBoardScope<T> scope) {
     // Simple adjacent-forward reorder on long-press for discoverability.
     // Hosts can also call controller.reorderColumn directly.
     final board = scope.workspace.boardById(widget.boardId);
@@ -189,7 +189,7 @@ class BoardColumnViewState<T> extends State<BoardColumnView<T>> {
     final from = widget.columnIndex;
     if (from < 0 || from >= board.columns.length - 1) return;
     scope.onColumnReordered?.call(
-      BoardFlowColumnReorder(
+      FlexiBoardColumnReorder(
         boardId: widget.boardId,
         fromIndex: from,
         toIndex: from + 1,
@@ -199,7 +199,7 @@ class BoardColumnViewState<T> extends State<BoardColumnView<T>> {
 
   @override
   Widget build(BuildContext context) {
-    final scope = BoardFlowScope.of<T>(context);
+    final scope = FlexiBoardScope.of<T>(context);
     final theme = scope.theme;
     final session = scope.dragSession;
     final scheme = Theme.of(context).colorScheme;
@@ -274,7 +274,7 @@ class BoardColumnViewState<T> extends State<BoardColumnView<T>> {
     int placeholderIndex,
     bool rejected,
   ) {
-    final scope = BoardFlowScope.of<T>(context);
+    final scope = FlexiBoardScope.of<T>(context);
     final theme = scope.theme;
     final scheme = Theme.of(context).colorScheme;
     final session = scope.dragSession;
@@ -322,7 +322,7 @@ class BoardColumnViewState<T> extends State<BoardColumnView<T>> {
 
     // Remaining cards with the in-flight card removed so the list collapses
     // and the placeholder (not a faded first card) is the drop shadow.
-    final visibleCards = <(int index, BoardFlowCard<T> card)>[];
+    final visibleCards = <(int index, FlexiBoardCard<T> card)>[];
     for (var i = 0; i < widget.cards.length; i++) {
       final card = widget.cards[i];
       if (draggingCardId != null && card.id == draggingCardId) continue;

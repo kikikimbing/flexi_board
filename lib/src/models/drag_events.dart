@@ -3,7 +3,7 @@ import 'package:flutter/painting.dart';
 import 'card.dart';
 import 'move.dart';
 
-enum BoardFlowDragPhase {
+enum FlexiBoardDragPhase {
   /// Long-press succeeded and the drag overlay is active.
   started,
 
@@ -14,9 +14,9 @@ enum BoardFlowDragPhase {
   cancelled,
 }
 
-/// Payload for [BoardFlow.onDrag].
-class BoardFlowDragDetails<T> {
-  const BoardFlowDragDetails({
+/// Payload for [FlexiBoard.onDrag].
+class FlexiBoardDragDetails<T> {
+  const FlexiBoardDragDetails({
     required this.phase,
     required this.card,
     required this.boardId,
@@ -29,8 +29,8 @@ class BoardFlowDragDetails<T> {
     this.rejected = false,
   });
 
-  final BoardFlowDragPhase phase;
-  final BoardFlowCard<T> card;
+  final FlexiBoardDragPhase phase;
+  final FlexiBoardCard<T> card;
 
   /// Origin of the drag.
   final String boardId;
@@ -38,29 +38,29 @@ class BoardFlowDragDetails<T> {
   final int index;
   final Offset globalPosition;
 
-  /// Current hover target while dragging (set on [BoardFlowDragPhase.updated]).
+  /// Current hover target while dragging (set on [FlexiBoardDragPhase.updated]).
   final String? hoverBoardId;
   final String? hoverColumnId;
   final int? hoverIndex;
   final bool rejected;
 }
 
-/// Payload for [BoardFlow.onDrop].
-class BoardFlowDropDetails<T> {
-  const BoardFlowDropDetails({
+/// Payload for [FlexiBoard.onDrop].
+class FlexiBoardDropDetails<T> {
+  const FlexiBoardDropDetails({
     required this.card,
     required this.accepted,
     this.move,
   });
 
-  final BoardFlowCard<T> card;
+  final FlexiBoardCard<T> card;
 
   /// True when the drop produced an applied / notified move.
   final bool accepted;
 
   /// Non-null when [accepted] is true.
-  final BoardFlowMove<T>? move;
+  final FlexiBoardMove<T>? move;
 }
 
-typedef BoardFlowDragCallback<T> = void Function(BoardFlowDragDetails<T> details);
-typedef BoardFlowDropCallback<T> = void Function(BoardFlowDropDetails<T> details);
+typedef FlexiBoardDragCallback<T> = void Function(FlexiBoardDragDetails<T> details);
+typedef FlexiBoardDropCallback<T> = void Function(FlexiBoardDropDetails<T> details);

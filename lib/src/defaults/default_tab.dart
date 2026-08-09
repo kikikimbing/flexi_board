@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../models/board.dart';
-import 'board_flow_theme.dart';
+import 'flexi_board_theme.dart';
 
 /// Default board tab when [boardTabBuilder] is omitted.
 class DefaultBoardTab<T> extends StatelessWidget {
@@ -14,10 +14,10 @@ class DefaultBoardTab<T> extends StatelessWidget {
     this.onTap,
   });
 
-  final BoardFlowBoard<T> board;
+  final FlexiBoardBoard<T> board;
   final bool selected;
   final bool dragHover;
-  final BoardFlowTheme theme;
+  final FlexiBoardTheme theme;
   final VoidCallback? onTap;
 
   @override

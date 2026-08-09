@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../models/column.dart';
 import '../policies/wip_policy.dart';
-import 'board_flow_theme.dart';
+import 'flexi_board_theme.dart';
 
 /// Default column header when [columnHeaderBuilder] is omitted.
 class DefaultColumnHeader<T> extends StatelessWidget {
@@ -13,9 +13,9 @@ class DefaultColumnHeader<T> extends StatelessWidget {
     this.policies,
   });
 
-  final BoardFlowColumn<T> column;
-  final BoardFlowTheme theme;
-  final BoardFlowPolicies<T>? policies;
+  final FlexiBoardColumn<T> column;
+  final FlexiBoardTheme theme;
+  final FlexiBoardPolicies<T>? policies;
 
   @override
   Widget build(BuildContext context) {

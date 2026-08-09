@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../models/card.dart';
-import 'board_flow_theme.dart';
+import 'flexi_board_theme.dart';
 
 /// Default card chrome when [cardBuilder] is omitted.
 class DefaultBoardCard<T> extends StatelessWidget {
@@ -13,8 +13,8 @@ class DefaultBoardCard<T> extends StatelessWidget {
     this.isSelected = false,
   });
 
-  final BoardFlowCard<T> card;
-  final BoardFlowTheme theme;
+  final FlexiBoardCard<T> card;
+  final FlexiBoardTheme theme;
   final bool isDragging;
   final bool isSelected;
 

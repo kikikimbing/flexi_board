@@ -1,4 +1,4 @@
-import 'package:board_flow/board_flow.dart';
+import 'package:flexi_board/flexi_board.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -23,11 +23,11 @@ void main() {
       statusBarIconBrightness: Brightness.dark,
     ),
   );
-  runApp(const BoardFlowExampleApp());
+  runApp(const FlexiBoardExampleApp());
 }
 
-class BoardFlowExampleApp extends StatelessWidget {
-  const BoardFlowExampleApp({super.key});
+class FlexiBoardExampleApp extends StatelessWidget {
+  const FlexiBoardExampleApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -43,7 +43,7 @@ class BoardFlowExampleApp extends StatelessWidget {
     );
 
     return MaterialApp(
-      title: 'Board Flow',
+      title: 'FlexiBoard',
       debugShowCheckedModeBanner: false,
       theme: base.copyWith(
         scaffoldBackgroundColor: _sky,
@@ -84,15 +84,15 @@ class ExampleHome extends StatefulWidget {
 
 class _ExampleHomeState extends State<ExampleHome>
     with SingleTickerProviderStateMixin {
-  late final BoardFlowController<Task> _controller;
+  late final FlexiBoardController<Task> _controller;
   late final AnimationController _intro;
-  BoardFlowLayout _layout = BoardFlowLayout.tabs;
+  FlexiBoardLayout _layout = FlexiBoardLayout.tabs;
   bool _useCustomCards = true;
 
   @override
   void initState() {
     super.initState();
-    _controller = BoardFlowController<Task>(initial: _buildWorkspace());
+    _controller = FlexiBoardController<Task>(initial: _buildWorkspace());
     _intro = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 700),
@@ -189,10 +189,10 @@ class _ExampleHomeState extends State<ExampleHome>
                             ),
                             child: ClipRRect(
                               borderRadius: BorderRadius.circular(24),
-                              child: BoardFlow<Task>(
+                              child: FlexiBoard<Task>(
                                 controller: _controller,
                                 layout: _layout,
-                                physics: BoardFlowPhysics.snappy,
+                                physics: FlexiBoardPhysics.snappy,
                                 theme: _boardTheme,
                                 cardBuilder:
                                     _useCustomCards ? _buildCustomCard : null,
@@ -228,7 +228,7 @@ class _ExampleHomeState extends State<ExampleHome>
     );
   }
 
-  BoardFlowTheme get _boardTheme => const BoardFlowTheme(
+  FlexiBoardTheme get _boardTheme => const FlexiBoardTheme(
         boardBackgroundColor: Color(0x00FFFFFF),
         columnBackgroundColor: Color(0xFFF7FBFD),
         columnHeaderColor: Color(0xFFF0F7FA),
@@ -247,7 +247,7 @@ class _ExampleHomeState extends State<ExampleHome>
 
   Widget _buildTab(
     BuildContext context,
-    BoardFlowBoard<Task> board,
+    FlexiBoardBoard<Task> board,
     bool selected,
     bool dragHover,
   ) {
@@ -278,7 +278,7 @@ class _ExampleHomeState extends State<ExampleHome>
     );
   }
 
-  Widget _buildColumnHeader(BuildContext context, BoardFlowColumn<Task> column) {
+  Widget _buildColumnHeader(BuildContext context, FlexiBoardColumn<Task> column) {
     final limit = column.wipLimit;
     return Padding(
       padding: const EdgeInsets.fromLTRB(14, 14, 14, 8),
@@ -320,7 +320,7 @@ class _ExampleHomeState extends State<ExampleHome>
     );
   }
 
-  Widget _buildColumnFooter(BuildContext context, BoardFlowColumn<Task> column) {
+  Widget _buildColumnFooter(BuildContext context, FlexiBoardColumn<Task> column) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
       child: TextButton.icon(
@@ -332,7 +332,7 @@ class _ExampleHomeState extends State<ExampleHome>
           _controller.addCard(
             boardId: _controller.activeBoardId,
             columnId: column.id,
-            card: BoardFlowCard(
+            card: FlexiBoardCard(
               id: 'new_${DateTime.now().millisecondsSinceEpoch}',
               data: Task(
                 title: 'New task',
@@ -349,7 +349,7 @@ class _ExampleHomeState extends State<ExampleHome>
     );
   }
 
-  Widget _buildEmptyColumn(BuildContext context, BoardFlowColumn<Task> column) {
+  Widget _buildEmptyColumn(BuildContext context, FlexiBoardColumn<Task> column) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 28),
       child: Text(
@@ -366,8 +366,8 @@ class _ExampleHomeState extends State<ExampleHome>
 
   Widget _buildCustomCard(
     BuildContext context,
-    BoardFlowCard<Task> card,
-    BoardFlowCardDragDetails details,
+    FlexiBoardCard<Task> card,
+    FlexiBoardCardDragDetails details,
   ) {
     final priority = card.data.priority;
     final accent = switch (priority) {
@@ -490,7 +490,7 @@ class _TopBar extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Board Flow',
+                  'FlexiBoard',
                   style: TextStyle(
                     fontFamily: 'Fraunces', 
                     fontSize: 24,
@@ -585,15 +585,15 @@ class _LayoutSwitcher extends StatelessWidget {
     required this.onChanged,
   });
 
-  final BoardFlowLayout layout;
-  final ValueChanged<BoardFlowLayout> onChanged;
+  final FlexiBoardLayout layout;
+  final ValueChanged<FlexiBoardLayout> onChanged;
 
   @override
   Widget build(BuildContext context) {
-    final items = <(BoardFlowLayout, String, IconData)>[
-      (BoardFlowLayout.single, 'One', Icons.crop_portrait_rounded),
-      (BoardFlowLayout.tabs, 'Tabs', Icons.tab_rounded),
-      (BoardFlowLayout.sideBySide, 'Split', Icons.view_column_rounded),
+    final items = <(FlexiBoardLayout, String, IconData)>[
+      (FlexiBoardLayout.single, 'One', Icons.crop_portrait_rounded),
+      (FlexiBoardLayout.tabs, 'Tabs', Icons.tab_rounded),
+      (FlexiBoardLayout.sideBySide, 'Split', Icons.view_column_rounded),
     ];
 
     return Container(
@@ -689,19 +689,19 @@ class Task {
   String toString() => title;
 }
 
-BoardFlowWorkspace<Task> _buildWorkspace() {
-  return BoardFlowWorkspace<Task>(
+FlexiBoardWorkspace<Task> _buildWorkspace() {
+  return FlexiBoardWorkspace<Task>(
     activeBoardId: 'product',
     boards: [
-      BoardFlowBoard<Task>(
+      FlexiBoardBoard<Task>(
         id: 'product',
         title: 'Product',
         columns: [
-          BoardFlowColumn<Task>(
+          FlexiBoardColumn<Task>(
             id: 'backlog',
             title: 'Backlog',
             cards: [
-              BoardFlowCard(
+              FlexiBoardCard(
                 id: 'p1',
                 data: Task(
                   title: 'Research competitors',
@@ -709,7 +709,7 @@ BoardFlowWorkspace<Task> _buildWorkspace() {
                   tag: 'Discovery',
                 ),
               ),
-              BoardFlowCard(
+              FlexiBoardCard(
                 id: 'p2',
                 data: Task(
                   title: 'Draft product brief',
@@ -719,12 +719,12 @@ BoardFlowWorkspace<Task> _buildWorkspace() {
               ),
             ],
           ),
-          BoardFlowColumn<Task>(
+          FlexiBoardColumn<Task>(
             id: 'doing',
             title: 'In Progress',
             wipLimit: 2,
             cards: [
-              BoardFlowCard(
+              FlexiBoardCard(
                 id: 'p3',
                 data: Task(
                   title: 'Prototype drag physics',
@@ -734,21 +734,21 @@ BoardFlowWorkspace<Task> _buildWorkspace() {
               ),
             ],
           ),
-          const BoardFlowColumn<Task>(
+          const FlexiBoardColumn<Task>(
             id: 'done',
             title: 'Done',
           ),
         ],
       ),
-      BoardFlowBoard<Task>(
+      FlexiBoardBoard<Task>(
         id: 'marketing',
         title: 'Marketing',
         columns: [
-          BoardFlowColumn<Task>(
+          FlexiBoardColumn<Task>(
             id: 'ideas',
             title: 'Ideas',
             cards: [
-              BoardFlowCard(
+              FlexiBoardCard(
                 id: 'm1',
                 data: Task(
                   title: 'Launch announcement',
@@ -758,7 +758,7 @@ BoardFlowWorkspace<Task> _buildWorkspace() {
               ),
             ],
           ),
-          const BoardFlowColumn<Task>(
+          const FlexiBoardColumn<Task>(
             id: 'scheduled',
             title: 'Scheduled',
             wipLimit: 3,

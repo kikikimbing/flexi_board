@@ -1,4 +1,4 @@
-# board_flow
+# flexi_board
 
 Plug-and-play **multi-board drag-and-drop** for Flutter.
 
@@ -12,37 +12,37 @@ Plug-and-play **multi-board drag-and-drop** for Flutter.
 
 ```yaml
 dependencies:
-  board_flow:
+  flexi_board:
     path: ../ # or pub version when published
 ```
 
 ## Quick start (defaults)
 
 ```dart
-final controller = BoardFlowController<String>(
-  initial: BoardFlowWorkspace(
+final controller = FlexiBoardController<String>(
+  initial: FlexiBoardWorkspace(
     boards: [
-      BoardFlowBoard(
+      FlexiBoardBoard(
         id: 'main',
         title: 'Main',
         columns: [
-          BoardFlowColumn(
+          FlexiBoardColumn(
             id: 'todo',
             title: 'Todo',
             cards: [
-              BoardFlowCard(id: '1', data: 'Ship board_flow'),
+              FlexiBoardCard(id: '1', data: 'Ship flexi_board'),
             ],
           ),
-          BoardFlowColumn(id: 'done', title: 'Done'),
+          FlexiBoardColumn(id: 'done', title: 'Done'),
         ],
       ),
     ],
   ),
 );
 
-BoardFlow<String>(
+FlexiBoard<String>(
   controller: controller,
-  layout: BoardFlowLayout.single,
+  layout: FlexiBoardLayout.single,
 );
 ```
 
@@ -51,9 +51,9 @@ BoardFlow<String>(
 Own the workspace yourself and apply moves in `onDrop` or `onCardMoved`:
 
 ```dart
-BoardFlow<Task>(
+FlexiBoard<Task>(
   workspace: myWorkspace,
-  layout: BoardFlowLayout.tabs,
+  layout: FlexiBoardLayout.tabs,
   cardBuilder: (context, card, details) => MyTaskTile(task: card.data),
   onDrag: (details) {
     // started | updated | cancelled
@@ -71,18 +71,18 @@ BoardFlow<Task>(
 
 | Layout | Behavior |
 |---|---|
-| `BoardFlowLayout.single` | One board canvas |
-| `BoardFlowLayout.tabs` | Tab strip; drag over a tab to switch boards, then drop |
-| `BoardFlowLayout.sideBySide` | Multiple boards visible; drag across boards |
+| `FlexiBoardLayout.single` | One board canvas |
+| `FlexiBoardLayout.tabs` | Tab strip; drag over a tab to switch boards, then drop |
+| `FlexiBoardLayout.sideBySide` | Multiple boards visible; drag across boards |
 
 ## Snappy cross-board drag
 
-Use `BoardFlowPhysics.snappy` so entering another board snaps the hover (and floating card) to the nearest column slot:
+Use `FlexiBoardPhysics.snappy` so entering another board snaps the hover (and floating card) to the nearest column slot:
 
 ```dart
-BoardFlow(
-  physics: BoardFlowPhysics.snappy,
-  layout: BoardFlowLayout.sideBySide,
+FlexiBoard(
+  physics: FlexiBoardPhysics.snappy,
+  layout: FlexiBoardLayout.sideBySide,
   ...
 );
 ```
@@ -90,8 +90,8 @@ BoardFlow(
 ## Policies
 
 ```dart
-BoardFlow(
-  policies: BoardFlowPolicies(
+FlexiBoard(
+  policies: FlexiBoardPolicies(
     wipEnabled: true,
     allowColumnReorder: true,
     canAcceptDrop: (move, workspace) => true,

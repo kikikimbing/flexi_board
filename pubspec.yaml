@@ -1,10 +1,10 @@
-name: board_flow
+name: flexi_board
 description: >-
   Plug-and-play multi-board drag-and-drop for Flutter. Mechanism-first physics
   with optional default UI, 1..N boards, cross-board moves, WIP, and undo —
   flutter-only, state-management agnostic.
 version: 0.1.0
-homepage: https://github.com/ananta/board_flow
+homepage: https://github.com/ananta/flexi_board
 
 environment:
   sdk: ^3.12.2

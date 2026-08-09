@@ -4,16 +4,16 @@ import 'column.dart';
 import 'move.dart';
 
 /// Root workspace holding one or more boards.
-class BoardFlowWorkspace<T> {
-  const BoardFlowWorkspace({
+class FlexiBoardWorkspace<T> {
+  const FlexiBoardWorkspace({
     required this.boards,
     this.activeBoardId,
   });
 
-  final List<BoardFlowBoard<T>> boards;
+  final List<FlexiBoardBoard<T>> boards;
   final String? activeBoardId;
 
-  BoardFlowBoard<T>? boardById(String id) {
+  FlexiBoardBoard<T>? boardById(String id) {
     for (final board in boards) {
       if (board.id == id) return board;
     }
@@ -25,12 +25,12 @@ class BoardFlowWorkspace<T> {
       return activeBoardId!;
     }
     if (boards.isEmpty) {
-      throw StateError('BoardFlowWorkspace has no boards');
+      throw StateError('FlexiBoardWorkspace has no boards');
     }
     return boards.first.id;
   }
 
-  BoardFlowBoard<T> get activeBoard {
+  FlexiBoardBoard<T> get activeBoard {
     final board = boardById(resolvedActiveBoardId);
     if (board == null) {
       throw StateError('Active board not found: $resolvedActiveBoardId');
@@ -38,18 +38,18 @@ class BoardFlowWorkspace<T> {
     return board;
   }
 
-  BoardFlowWorkspace<T> copyWith({
-    List<BoardFlowBoard<T>>? boards,
+  FlexiBoardWorkspace<T> copyWith({
+    List<FlexiBoardBoard<T>>? boards,
     String? activeBoardId,
   }) {
-    return BoardFlowWorkspace<T>(
+    return FlexiBoardWorkspace<T>(
       boards: boards ?? this.boards,
       activeBoardId: activeBoardId ?? this.activeBoardId,
     );
   }
 
   /// Applies a card move immutably. Returns the same instance if no-op.
-  BoardFlowWorkspace<T> applyMove(BoardFlowMove<T> move) {
+  FlexiBoardWorkspace<T> applyMove(FlexiBoardMove<T> move) {
     if (move.fromBoardId == move.toBoardId &&
         move.fromColumnId == move.toColumnId &&
         move.fromIndex == move.toIndex) {
@@ -66,7 +66,7 @@ class BoardFlowWorkspace<T> {
     return _applyCrossBoardMove(fromBoard, toBoard, move);
   }
 
-  BoardFlowWorkspace<T> applyColumnReorder(BoardFlowColumnReorder reorder) {
+  FlexiBoardWorkspace<T> applyColumnReorder(FlexiBoardColumnReorder reorder) {
     final board = boardById(reorder.boardId);
     if (board == null) return this;
     if (reorder.fromIndex < 0 ||
@@ -77,7 +77,7 @@ class BoardFlowWorkspace<T> {
       return this;
     }
 
-    final columns = List<BoardFlowColumn<T>>.of(board.columns);
+    final columns = List<FlexiBoardColumn<T>>.of(board.columns);
     final column = columns.removeAt(reorder.fromIndex);
     columns.insert(reorder.toIndex, column);
 
@@ -90,12 +90,12 @@ class BoardFlowWorkspace<T> {
     );
   }
 
-  BoardFlowWorkspace<T> _applySameBoardMove(
-    BoardFlowBoard<T> board,
-    BoardFlowMove<T> move,
+  FlexiBoardWorkspace<T> _applySameBoardMove(
+    FlexiBoardBoard<T> board,
+    FlexiBoardMove<T> move,
   ) {
     final columns = board.columns
-        .map((c) => c.copyWith(cards: List<BoardFlowCard<T>>.of(c.cards)))
+        .map((c) => c.copyWith(cards: List<FlexiBoardCard<T>>.of(c.cards)))
         .toList(growable: false);
 
     final fromColIndex =
@@ -103,7 +103,7 @@ class BoardFlowWorkspace<T> {
     final toColIndex = columns.indexWhere((c) => c.id == move.toColumnId);
     if (fromColIndex < 0 || toColIndex < 0) return this;
 
-    final fromCards = List<BoardFlowCard<T>>.of(columns[fromColIndex].cards);
+    final fromCards = List<FlexiBoardCard<T>>.of(columns[fromColIndex].cards);
     if (move.fromIndex < 0 || move.fromIndex >= fromCards.length) return this;
 
     final card = fromCards.removeAt(move.fromIndex);
@@ -119,7 +119,7 @@ class BoardFlowWorkspace<T> {
       columns[fromColIndex] = columns[fromColIndex].copyWith(cards: fromCards);
     } else {
       columns[fromColIndex] = columns[fromColIndex].copyWith(cards: fromCards);
-      final toCards = List<BoardFlowCard<T>>.of(columns[toColIndex].cards);
+      final toCards = List<FlexiBoardCard<T>>.of(columns[toColIndex].cards);
       var insertAt = move.toIndex;
       if (insertAt > toCards.length) insertAt = toCards.length;
       toCards.insert(insertAt, relocated);
@@ -134,16 +134,16 @@ class BoardFlowWorkspace<T> {
     );
   }
 
-  BoardFlowWorkspace<T> _applyCrossBoardMove(
-    BoardFlowBoard<T> fromBoard,
-    BoardFlowBoard<T> toBoard,
-    BoardFlowMove<T> move,
+  FlexiBoardWorkspace<T> _applyCrossBoardMove(
+    FlexiBoardBoard<T> fromBoard,
+    FlexiBoardBoard<T> toBoard,
+    FlexiBoardMove<T> move,
   ) {
     final fromColumns = fromBoard.columns
-        .map((c) => c.copyWith(cards: List<BoardFlowCard<T>>.of(c.cards)))
+        .map((c) => c.copyWith(cards: List<FlexiBoardCard<T>>.of(c.cards)))
         .toList(growable: false);
     final toColumns = toBoard.columns
-        .map((c) => c.copyWith(cards: List<BoardFlowCard<T>>.of(c.cards)))
+        .map((c) => c.copyWith(cards: List<FlexiBoardCard<T>>.of(c.cards)))
         .toList(growable: false);
 
     final fromColIndex =
@@ -152,7 +152,7 @@ class BoardFlowWorkspace<T> {
     if (fromColIndex < 0 || toColIndex < 0) return this;
 
     final fromCards =
-        List<BoardFlowCard<T>>.of(fromColumns[fromColIndex].cards);
+        List<FlexiBoardCard<T>>.of(fromColumns[fromColIndex].cards);
     if (move.fromIndex < 0 || move.fromIndex >= fromCards.length) return this;
 
     final card = fromCards.removeAt(move.fromIndex);
@@ -163,7 +163,7 @@ class BoardFlowWorkspace<T> {
       boardId: move.toBoardId,
       columnId: move.toColumnId,
     );
-    final toCards = List<BoardFlowCard<T>>.of(toColumns[toColIndex].cards);
+    final toCards = List<FlexiBoardCard<T>>.of(toColumns[toColIndex].cards);
     var insertAt = move.toIndex;
     if (insertAt > toCards.length) insertAt = toCards.length;
     toCards.insert(insertAt, relocated);

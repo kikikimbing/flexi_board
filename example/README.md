@@ -1,3 +1,3 @@
-# board_flow_example
+# flexi_board_example
 
 A new Flutter project.

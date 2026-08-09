@@ -4,8 +4,8 @@ import '../models/move.dart';
 import '../models/workspace.dart';
 
 /// Drop acceptance and WIP helpers.
-class BoardFlowPolicies<T> {
-  const BoardFlowPolicies({
+class FlexiBoardPolicies<T> {
+  const FlexiBoardPolicies({
     this.wipEnabled = true,
     this.allowColumnReorder = true,
     this.canAcceptDrop,
@@ -15,12 +15,12 @@ class BoardFlowPolicies<T> {
   final bool allowColumnReorder;
 
   /// Host override. When null, WIP rules apply when [wipEnabled] is true.
-  final bool Function(BoardFlowMove<T> move, BoardFlowWorkspace<T> workspace)?
+  final bool Function(FlexiBoardMove<T> move, FlexiBoardWorkspace<T> workspace)?
       canAcceptDrop;
 
-  static BoardFlowPolicies<T> of<T>() => BoardFlowPolicies<T>();
+  static FlexiBoardPolicies<T> of<T>() => FlexiBoardPolicies<T>();
 
-  bool accepts(BoardFlowMove<T> move, BoardFlowWorkspace<T> workspace) {
+  bool accepts(FlexiBoardMove<T> move, FlexiBoardWorkspace<T> workspace) {
     if (canAcceptDrop != null) {
       return canAcceptDrop!(move, workspace);
     }
@@ -28,7 +28,7 @@ class BoardFlowPolicies<T> {
     return !wouldExceedWip(move, workspace);
   }
 
-  bool wouldExceedWip(BoardFlowMove<T> move, BoardFlowWorkspace<T> workspace) {
+  bool wouldExceedWip(FlexiBoardMove<T> move, FlexiBoardWorkspace<T> workspace) {
     if (move.isSameColumn) return false;
     final board = workspace.boardById(move.toBoardId);
     final column = board?.columnById(move.toColumnId);
@@ -36,13 +36,13 @@ class BoardFlowPolicies<T> {
     return isAtCapacity(column);
   }
 
-  bool isAtCapacity(BoardFlowColumn<T> column) {
+  bool isAtCapacity(FlexiBoardColumn<T> column) {
     final limit = column.wipLimit;
     if (limit == null) return false;
     return column.cards.length >= limit;
   }
 
-  bool isApproachingCapacity(BoardFlowColumn<T> column) {
+  bool isApproachingCapacity(FlexiBoardColumn<T> column) {
     final limit = column.wipLimit;
     if (limit == null || limit <= 0) return false;
     return column.cards.length >= (limit - 1) && column.cards.length < limit;
@@ -51,7 +51,7 @@ class BoardFlowPolicies<T> {
 
 /// Simple WIP helpers used by default UI.
 bool cardBelongsToSwimlane<T>(
-  BoardFlowCard<T> card,
-  bool Function(BoardFlowCard<T>) filter,
+  FlexiBoardCard<T> card,
+  bool Function(FlexiBoardCard<T>) filter,
 ) =>
     filter(card);

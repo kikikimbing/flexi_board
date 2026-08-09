@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../defaults/default_card.dart';
 import '../models/card.dart';
-import 'board_flow_scope.dart';
+import 'flexi_board_scope.dart';
 
 class BoardCardSlot<T> extends StatefulWidget {
   const BoardCardSlot({
@@ -16,7 +16,7 @@ class BoardCardSlot<T> extends StatefulWidget {
   final String boardId;
   final String columnId;
   final int index;
-  final BoardFlowCard<T> card;
+  final FlexiBoardCard<T> card;
 
   @override
   State<BoardCardSlot<T>> createState() => _BoardCardSlotState<T>();
@@ -31,10 +31,10 @@ class _BoardCardSlotState<T> extends State<BoardCardSlot<T>> {
 
   @override
   Widget build(BuildContext context) {
-    final scope = BoardFlowScope.of<T>(context);
+    final scope = FlexiBoardScope.of<T>(context);
     final session = scope.dragSession;
     final isGhost = session.active && session.cardId == widget.card.id;
-    final details = BoardFlowCardDragDetails(
+    final details = FlexiBoardCardDragDetails(
       isDragging: isGhost,
       isGhost: isGhost,
     );

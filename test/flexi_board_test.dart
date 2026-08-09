@@ -1,48 +1,48 @@
-import 'package:board_flow/board_flow.dart';
+import 'package:flexi_board/flexi_board.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-BoardFlowWorkspace<String> sampleWorkspace() {
-  return BoardFlowWorkspace<String>(
+FlexiBoardWorkspace<String> sampleWorkspace() {
+  return FlexiBoardWorkspace<String>(
     activeBoardId: 'b1',
     boards: [
-      BoardFlowBoard<String>(
+      FlexiBoardBoard<String>(
         id: 'b1',
         title: 'Product',
         columns: [
-          BoardFlowColumn<String>(
+          FlexiBoardColumn<String>(
             id: 'todo',
             title: 'Todo',
             cards: const [
-              BoardFlowCard(id: 'c1', data: 'Task 1'),
-              BoardFlowCard(id: 'c2', data: 'Task 2'),
+              FlexiBoardCard(id: 'c1', data: 'Task 1'),
+              FlexiBoardCard(id: 'c2', data: 'Task 2'),
             ],
           ),
-          BoardFlowColumn<String>(
+          FlexiBoardColumn<String>(
             id: 'doing',
             title: 'Doing',
             wipLimit: 1,
             cards: const [
-              BoardFlowCard(id: 'c3', data: 'Task 3'),
+              FlexiBoardCard(id: 'c3', data: 'Task 3'),
             ],
           ),
-          const BoardFlowColumn<String>(
+          const FlexiBoardColumn<String>(
             id: 'done',
             title: 'Done',
           ),
         ],
       ),
-      BoardFlowBoard<String>(
+      FlexiBoardBoard<String>(
         id: 'b2',
         title: 'Marketing',
         columns: [
-          BoardFlowColumn<String>(
+          FlexiBoardColumn<String>(
             id: 'ideas',
             title: 'Ideas',
             cards: const [
-              BoardFlowCard(id: 'm1', data: 'Campaign'),
+              FlexiBoardCard(id: 'm1', data: 'Campaign'),
             ],
           ),
-          const BoardFlowColumn<String>(
+          const FlexiBoardColumn<String>(
             id: 'shipped',
             title: 'Shipped',
           ),
@@ -53,10 +53,10 @@ BoardFlowWorkspace<String> sampleWorkspace() {
 }
 
 void main() {
-  group('BoardFlowWorkspace.applyMove', () {
+  group('FlexiBoardWorkspace.applyMove', () {
     test('reorders within the same column', () {
       final ws = sampleWorkspace();
-      final move = BoardFlowMove<String>(
+      final move = FlexiBoardMove<String>(
         card: ws.boards.first.columns.first.cards.first,
         fromBoardId: 'b1',
         toBoardId: 'b1',
@@ -71,7 +71,7 @@ void main() {
 
     test('moves across columns on the same board', () {
       final ws = sampleWorkspace();
-      final move = BoardFlowMove<String>(
+      final move = FlexiBoardMove<String>(
         card: ws.boards.first.columns.first.cards.first,
         fromBoardId: 'b1',
         toBoardId: 'b1',
@@ -87,7 +87,7 @@ void main() {
 
     test('moves across boards', () {
       final ws = sampleWorkspace();
-      final move = BoardFlowMove<String>(
+      final move = FlexiBoardMove<String>(
         card: ws.boards.first.columns.first.cards.first,
         fromBoardId: 'b1',
         toBoardId: 'b2',
@@ -108,8 +108,8 @@ void main() {
   group('WIP policy', () {
     test('rejects drop into full column', () {
       final ws = sampleWorkspace();
-      final policies = BoardFlowPolicies<String>();
-      final move = BoardFlowMove<String>(
+      final policies = FlexiBoardPolicies<String>();
+      final move = FlexiBoardMove<String>(
         card: ws.boards.first.columns.first.cards.first,
         fromBoardId: 'b1',
         toBoardId: 'b1',
@@ -123,8 +123,8 @@ void main() {
 
     test('allows same-column reorder even at WIP', () {
       final ws = sampleWorkspace();
-      final policies = BoardFlowPolicies<String>();
-      final move = BoardFlowMove<String>(
+      final policies = FlexiBoardPolicies<String>();
+      final move = FlexiBoardMove<String>(
         card: ws.boards.first.columnById('doing')!.cards.first,
         fromBoardId: 'b1',
         toBoardId: 'b1',
@@ -137,12 +137,12 @@ void main() {
     });
   });
 
-  group('BoardFlowController', () {
+  group('FlexiBoardController', () {
     test('undo and redo restore workspace', () {
-      final controller = BoardFlowController<String>(
+      final controller = FlexiBoardController<String>(
         initial: sampleWorkspace(),
       );
-      final move = BoardFlowMove<String>(
+      final move = FlexiBoardMove<String>(
         card: controller.workspace.boards.first.columns.first.cards.first,
         fromBoardId: 'b1',
         toBoardId: 'b1',
@@ -166,12 +166,12 @@ void main() {
     });
 
     test('column reorder', () {
-      final controller = BoardFlowController<String>(
+      final controller = FlexiBoardController<String>(
         initial: sampleWorkspace(),
       );
       expect(
         controller.reorderColumn(
-          const BoardFlowColumnReorder(
+          const FlexiBoardColumnReorder(
             boardId: 'b1',
             fromIndex: 0,
             toIndex: 2,

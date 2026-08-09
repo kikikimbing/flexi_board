@@ -1,8 +1,8 @@
 import 'card.dart';
 
 /// Describes a completed (or proposed) card move within or across boards.
-class BoardFlowMove<T> {
-  const BoardFlowMove({
+class FlexiBoardMove<T> {
+  const FlexiBoardMove({
     required this.card,
     required this.fromBoardId,
     required this.toBoardId,
@@ -12,7 +12,7 @@ class BoardFlowMove<T> {
     required this.toIndex,
   });
 
-  final BoardFlowCard<T> card;
+  final FlexiBoardCard<T> card;
   final String fromBoardId;
   final String toBoardId;
   final String fromColumnId;
@@ -26,7 +26,7 @@ class BoardFlowMove<T> {
 
   @override
   bool operator ==(Object other) {
-    return other is BoardFlowMove<T> &&
+    return other is FlexiBoardMove<T> &&
         other.card == card &&
         other.fromBoardId == fromBoardId &&
         other.toBoardId == toBoardId &&
@@ -49,8 +49,8 @@ class BoardFlowMove<T> {
 }
 
 /// Column reorder within a board.
-class BoardFlowColumnReorder {
-  const BoardFlowColumnReorder({
+class FlexiBoardColumnReorder {
+  const FlexiBoardColumnReorder({
     required this.boardId,
     required this.fromIndex,
     required this.toIndex,

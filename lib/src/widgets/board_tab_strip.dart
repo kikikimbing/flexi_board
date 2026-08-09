@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 
 import '../defaults/default_tab.dart';
 import '../models/board.dart';
-import 'board_flow_scope.dart';
+import 'flexi_board_scope.dart';
 
-/// Global keys used by BoardFlow to detect tab hover while dragging.
+/// Global keys used by FlexiBoard to detect tab hover while dragging.
 class TabHitRegistry {
   final Map<String, GlobalKey> keys = {};
 
@@ -34,14 +34,14 @@ class BoardTabStripHit<T> extends StatelessWidget {
     this.hoveredBoardId,
   });
 
-  final List<BoardFlowBoard<T>> boards;
+  final List<FlexiBoardBoard<T>> boards;
   final String activeBoardId;
   final TabHitRegistry registry;
   final String? hoveredBoardId;
 
   @override
   Widget build(BuildContext context) {
-    final scope = BoardFlowScope.of<T>(context);
+    final scope = FlexiBoardScope.of<T>(context);
 
     return SizedBox(
       height: 52,

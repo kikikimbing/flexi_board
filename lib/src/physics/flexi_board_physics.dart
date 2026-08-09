@@ -1,8 +1,8 @@
 import 'package:flutter/animation.dart';
 
 /// Tunables for drag feel and edge auto-scroll.
-class BoardFlowPhysics {
-  const BoardFlowPhysics({
+class FlexiBoardPhysics {
+  const FlexiBoardPhysics({
     this.longPressDelay = const Duration(milliseconds: 180),
     this.edgeScrollExtent = 56,
     this.edgeScrollSpeed = 12,
@@ -42,10 +42,10 @@ class BoardFlowPhysics {
   /// placeholder slot rather than the finger.
   final bool snapFeedbackToPlaceholder;
 
-  static const BoardFlowPhysics standard = BoardFlowPhysics();
+  static const FlexiBoardPhysics standard = FlexiBoardPhysics();
 
   /// Snappy cross-board feel for demos / multi-board UIs.
-  static const BoardFlowPhysics snappy = BoardFlowPhysics(
+  static const FlexiBoardPhysics snappy = FlexiBoardPhysics(
     snapOnBoardEnter: true,
     snapFeedbackToPlaceholder: true,
     tabHoverSwitchDelay: Duration(milliseconds: 220),

@@ -1,21 +1,21 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter/material.dart';
-import 'package:board_flow/board_flow.dart';
+import 'package:flexi_board/flexi_board.dart';
 
 void main() {
   testWidgets('renders default cards for a single board', (tester) async {
-    final controller = BoardFlowController<String>(
-      initial: BoardFlowWorkspace<String>(
+    final controller = FlexiBoardController<String>(
+      initial: FlexiBoardWorkspace<String>(
         boards: [
-          BoardFlowBoard<String>(
+          FlexiBoardBoard<String>(
             id: 'b1',
             title: 'Main',
             columns: [
-              BoardFlowColumn<String>(
+              FlexiBoardColumn<String>(
                 id: 'todo',
                 title: 'Todo',
                 cards: const [
-                  BoardFlowCard(id: 'c1', data: 'Hello card'),
+                  FlexiBoardCard(id: 'c1', data: 'Hello card'),
                 ],
               ),
             ],
@@ -27,9 +27,9 @@ void main() {
     await tester.pumpWidget(
       MaterialApp(
         home: Scaffold(
-          body: BoardFlow<String>(
+          body: FlexiBoard<String>(
             controller: controller,
-            layout: BoardFlowLayout.single,
+            layout: FlexiBoardLayout.single,
           ),
         ),
       ),
@@ -43,18 +43,18 @@ void main() {
     await tester.pumpWidget(
       MaterialApp(
         home: Scaffold(
-          body: BoardFlow<String>(
-            workspace: BoardFlowWorkspace<String>(
+          body: FlexiBoard<String>(
+            workspace: FlexiBoardWorkspace<String>(
               boards: [
-                BoardFlowBoard<String>(
+                FlexiBoardBoard<String>(
                   id: 'b1',
                   title: 'Main',
                   columns: [
-                    BoardFlowColumn<String>(
+                    FlexiBoardColumn<String>(
                       id: 'todo',
                       title: 'Todo',
                       cards: const [
-                        BoardFlowCard(id: 'c1', data: 'X'),
+                        FlexiBoardCard(id: 'c1', data: 'X'),
                       ],
                     ),
                   ],
@@ -77,39 +77,39 @@ void main() {
     await tester.pumpWidget(
       MaterialApp(
         home: Scaffold(
-          body: BoardFlow<String>(
-            workspace: BoardFlowWorkspace<String>(
+          body: FlexiBoard<String>(
+            workspace: FlexiBoardWorkspace<String>(
               activeBoardId: 'a',
               boards: const [
-                BoardFlowBoard(
+                FlexiBoardBoard(
                   id: 'a',
                   title: 'Alpha',
                   columns: [
-                    BoardFlowColumn(
+                    FlexiBoardColumn(
                       id: 'c',
                       title: 'Col A',
                       cards: [
-                        BoardFlowCard(id: '1', data: 'Alpha card'),
+                        FlexiBoardCard(id: '1', data: 'Alpha card'),
                       ],
                     ),
                   ],
                 ),
-                BoardFlowBoard(
+                FlexiBoardBoard(
                   id: 'b',
                   title: 'Beta',
                   columns: [
-                    BoardFlowColumn(
+                    FlexiBoardColumn(
                       id: 'c',
                       title: 'Col B',
                       cards: [
-                        BoardFlowCard(id: '2', data: 'Beta card'),
+                        FlexiBoardCard(id: '2', data: 'Beta card'),
                       ],
                     ),
                   ],
                 ),
               ],
             ),
-            layout: BoardFlowLayout.tabs,
+            layout: FlexiBoardLayout.tabs,
           ),
         ),
       ),
@@ -131,35 +131,35 @@ void main() {
     await tester.pumpWidget(
       MaterialApp(
         home: Scaffold(
-          body: BoardFlow<String>(
-            workspace: BoardFlowWorkspace<String>(
+          body: FlexiBoard<String>(
+            workspace: FlexiBoardWorkspace<String>(
               activeBoardId: 'a',
               boards: const [
-                BoardFlowBoard(
+                FlexiBoardBoard(
                   id: 'a',
                   title: 'Alpha',
                   columns: [
-                    BoardFlowColumn(
+                    FlexiBoardColumn(
                       id: 'c',
                       title: 'Col',
-                      cards: [BoardFlowCard(id: '1', data: 'A')],
+                      cards: [FlexiBoardCard(id: '1', data: 'A')],
                     ),
                   ],
                 ),
-                BoardFlowBoard(
+                FlexiBoardBoard(
                   id: 'b',
                   title: 'Beta',
                   columns: [
-                    BoardFlowColumn(
+                    FlexiBoardColumn(
                       id: 'c',
                       title: 'Col',
-                      cards: [BoardFlowCard(id: '2', data: 'B')],
+                      cards: [FlexiBoardCard(id: '2', data: 'B')],
                     ),
                   ],
                 ),
               ],
             ),
-            layout: BoardFlowLayout.tabs,
+            layout: FlexiBoardLayout.tabs,
             boardTabBuilder: (context, board, selected, dragHover) {
               return Text(board.title);
             },
@@ -174,18 +174,18 @@ void main() {
   });
 
   test('drag and drop detail types expose phase and acceptance', () {
-    const card = BoardFlowCard<String>(id: 'c1', data: 'Task');
-    const drag = BoardFlowDragDetails<String>(
-      phase: BoardFlowDragPhase.started,
+    const card = FlexiBoardCard<String>(id: 'c1', data: 'Task');
+    const drag = FlexiBoardDragDetails<String>(
+      phase: FlexiBoardDragPhase.started,
       card: card,
       boardId: 'b1',
       columnId: 'todo',
       index: 0,
       globalPosition: Offset.zero,
     );
-    expect(drag.phase, BoardFlowDragPhase.started);
+    expect(drag.phase, FlexiBoardDragPhase.started);
 
-    const drop = BoardFlowDropDetails<String>(
+    const drop = FlexiBoardDropDetails<String>(
       card: card,
       accepted: false,
     );

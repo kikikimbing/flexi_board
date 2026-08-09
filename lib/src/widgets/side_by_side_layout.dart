@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../models/board.dart';
 import 'board_canvas.dart';
-import 'board_flow_scope.dart';
+import 'flexi_board_scope.dart';
 
 class SideBySideLayout<T> extends StatelessWidget {
   const SideBySideLayout({
@@ -11,12 +11,12 @@ class SideBySideLayout<T> extends StatelessWidget {
     required this.dropRegistry,
   });
 
-  final List<BoardFlowBoard<T>> boards;
+  final List<FlexiBoardBoard<T>> boards;
   final DropRegistry<T> dropRegistry;
 
   @override
   Widget build(BuildContext context) {
-    final scope = BoardFlowScope.of<T>(context);
+    final scope = FlexiBoardScope.of<T>(context);
     final theme = scope.theme;
     final scheme = Theme.of(context).colorScheme;
 

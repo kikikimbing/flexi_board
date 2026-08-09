@@ -7,7 +7,7 @@ import '../models/swimlane.dart';
 import '../physics/edge_auto_scroll.dart';
 import '../physics/hit_testing.dart';
 import 'board_column.dart';
-import 'board_flow_scope.dart';
+import 'flexi_board_scope.dart';
 
 /// Horizontal scrollable columns for one board.
 class BoardCanvas<T> extends StatefulWidget {
@@ -20,8 +20,8 @@ class BoardCanvas<T> extends StatefulWidget {
   });
 
   final String boardId;
-  final List<BoardFlowColumn<T>> columns;
-  final List<BoardFlowSwimlane<T>> swimlanes;
+  final List<FlexiBoardColumn<T>> columns;
+  final List<FlexiBoardSwimlane<T>> swimlanes;
   final DropRegistry<T>? dropRegistry;
 
   @override
@@ -36,7 +36,7 @@ class BoardCanvasState<T> extends State<BoardCanvas<T>> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final scope = BoardFlowScope.of<T>(context);
+    final scope = FlexiBoardScope.of<T>(context);
     _scroller?.dispose();
     _scroller = EdgeAutoScroller(
       controller: _scrollController,
@@ -67,7 +67,7 @@ class BoardCanvasState<T> extends State<BoardCanvas<T>> {
 
   void handlePointer(Offset global) {
     if (!mounted) return;
-    final scope = BoardFlowScope.of<T>(context);
+    final scope = FlexiBoardScope.of<T>(context);
     final session = scope.dragSession;
     if (!session.active) return;
 
@@ -140,7 +140,7 @@ class BoardCanvasState<T> extends State<BoardCanvas<T>> {
 
   @override
   Widget build(BuildContext context) {
-    final scope = BoardFlowScope.of<T>(context);
+    final scope = FlexiBoardScope.of<T>(context);
     final theme = scope.theme;
     final scheme = Theme.of(context).colorScheme;
 
@@ -189,8 +189,8 @@ class BoardCanvasState<T> extends State<BoardCanvas<T>> {
     );
   }
 
-  Widget _swimlaneHeader(BuildContext context, BoardFlowSwimlane<T> lane) {
-    final scope = BoardFlowScope.of<T>(context);
+  Widget _swimlaneHeader(BuildContext context, FlexiBoardSwimlane<T> lane) {
+    final scope = FlexiBoardScope.of<T>(context);
     return scope.swimlaneHeaderBuilder?.call(context, lane.id, lane.title) ??
         Padding(
           padding: const EdgeInsets.fromLTRB(12, 12, 12, 4),
@@ -205,10 +205,10 @@ class BoardCanvasState<T> extends State<BoardCanvas<T>> {
 
   Widget _buildColumnRow(
     BuildContext context,
-    List<BoardFlowColumn<T>> columns, {
+    List<FlexiBoardColumn<T>> columns, {
     required bool useScrollController,
   }) {
-    final scope = BoardFlowScope.of<T>(context);
+    final scope = FlexiBoardScope.of<T>(context);
     final theme = scope.theme;
     final scheme = Theme.of(context).colorScheme;
 
@@ -282,21 +282,21 @@ class DropRegistry<T> {
   }
 }
 
-BoardFlowCard<T>? findCardInWorkspace<T>(
+FlexiBoardCard<T>? findCardInWorkspace<T>(
   Iterable boards,
   String cardId,
 ) {
   for (final board in boards) {
     for (final column in board.columns) {
       for (final card in column.cards) {
-        if (card.id == cardId) return card as BoardFlowCard<T>;
+        if (card.id == cardId) return card as FlexiBoardCard<T>;
       }
     }
   }
   return null;
 }
 
-BoardFlowMove<T>? buildMoveFromSession<T>({
+FlexiBoardMove<T>? buildMoveFromSession<T>({
   required dynamic workspace,
   required dynamic session,
 }) {
@@ -313,7 +313,7 @@ BoardFlowMove<T>? buildMoveFromSession<T>({
   final card =
       findCardInWorkspace<T>(workspace.boards, session.cardId as String);
   if (card == null) return null;
-  return BoardFlowMove<T>(
+  return FlexiBoardMove<T>(
     card: card,
     fromBoardId: session.fromBoardId as String,
     toBoardId: session.hoverBoardId as String,

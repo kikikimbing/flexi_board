@@ -9,26 +9,26 @@ import '../policies/undo_stack.dart';
 import '../policies/wip_policy.dart';
 
 /// Optional convenience controller — hosts may ignore this and own state themselves.
-class BoardFlowController<T> extends ChangeNotifier {
-  BoardFlowController({
-    required BoardFlowWorkspace<T> initial,
-    BoardFlowPolicies<T>? policies,
+class FlexiBoardController<T> extends ChangeNotifier {
+  FlexiBoardController({
+    required FlexiBoardWorkspace<T> initial,
+    FlexiBoardPolicies<T>? policies,
     int maxUndoSteps = 50,
   })  : _workspace = initial,
-        policies = policies ?? BoardFlowPolicies<T>(),
+        policies = policies ?? FlexiBoardPolicies<T>(),
         _undo = UndoStack<T>(maxSteps: maxUndoSteps);
 
-  BoardFlowWorkspace<T> _workspace;
-  final BoardFlowPolicies<T> policies;
+  FlexiBoardWorkspace<T> _workspace;
+  final FlexiBoardPolicies<T> policies;
   final UndoStack<T> _undo;
 
-  BoardFlowWorkspace<T> get workspace => _workspace;
-  List<BoardFlowBoard<T>> get boards => _workspace.boards;
+  FlexiBoardWorkspace<T> get workspace => _workspace;
+  List<FlexiBoardBoard<T>> get boards => _workspace.boards;
   String get activeBoardId => _workspace.resolvedActiveBoardId;
   bool get canUndo => _undo.canUndo;
   bool get canRedo => _undo.canRedo;
 
-  void setWorkspace(BoardFlowWorkspace<T> workspace, {bool recordUndo = false}) {
+  void setWorkspace(FlexiBoardWorkspace<T> workspace, {bool recordUndo = false}) {
     if (recordUndo) {
       _undo.push(_workspace);
     }
@@ -42,7 +42,7 @@ class BoardFlowController<T> extends ChangeNotifier {
     notifyListeners();
   }
 
-  bool moveCard(BoardFlowMove<T> move) {
+  bool moveCard(FlexiBoardMove<T> move) {
     if (!policies.accepts(move, _workspace)) return false;
     final next = _workspace.applyMove(move);
     if (identical(next, _workspace) || next == _workspace) {
@@ -55,13 +55,13 @@ class BoardFlowController<T> extends ChangeNotifier {
     return true;
   }
 
-  bool _didMove(BoardFlowMove<T> move) {
+  bool _didMove(FlexiBoardMove<T> move) {
     return !(move.fromBoardId == move.toBoardId &&
         move.fromColumnId == move.toColumnId &&
         move.fromIndex == move.toIndex);
   }
 
-  bool reorderColumn(BoardFlowColumnReorder reorder) {
+  bool reorderColumn(FlexiBoardColumnReorder reorder) {
     if (!policies.allowColumnReorder) return false;
     final next = _workspace.applyColumnReorder(reorder);
     if (identical(next, _workspace)) return false;
@@ -74,14 +74,14 @@ class BoardFlowController<T> extends ChangeNotifier {
   void addCard({
     required String boardId,
     required String columnId,
-    required BoardFlowCard<T> card,
+    required FlexiBoardCard<T> card,
     int? index,
   }) {
     final board = _workspace.boardById(boardId);
     if (board == null) return;
     final columns = board.columns.map((c) {
       if (c.id != columnId) return c;
-      final cards = List<BoardFlowCard<T>>.of(c.cards);
+      final cards = List<FlexiBoardCard<T>>.of(c.cards);
       final insertAt = (index ?? cards.length).clamp(0, cards.length);
       cards.insert(
         insertAt,
@@ -100,12 +100,12 @@ class BoardFlowController<T> extends ChangeNotifier {
   }
 
   void removeCard(String cardId) {
-    BoardFlowWorkspace<T>? next;
+    FlexiBoardWorkspace<T>? next;
     for (final board in _workspace.boards) {
       for (final column in board.columns) {
         final index = column.cards.indexWhere((c) => c.id == cardId);
         if (index < 0) continue;
-        final cards = List<BoardFlowCard<T>>.of(column.cards)..removeAt(index);
+        final cards = List<FlexiBoardCard<T>>.of(column.cards)..removeAt(index);
         final columns = board.columns
             .map((c) => c.id == column.id ? c.copyWith(cards: cards) : c)
             .toList(growable: false);
@@ -140,14 +140,14 @@ class BoardFlowController<T> extends ChangeNotifier {
 }
 
 /// Helper to build a simple single-board workspace.
-BoardFlowWorkspace<T> workspaceFromColumns<T>({
+FlexiBoardWorkspace<T> workspaceFromColumns<T>({
   required String boardId,
   required String boardTitle,
-  required List<BoardFlowColumn<T>> columns,
+  required List<FlexiBoardColumn<T>> columns,
 }) {
-  return BoardFlowWorkspace<T>(
+  return FlexiBoardWorkspace<T>(
     boards: [
-      BoardFlowBoard<T>(
+      FlexiBoardBoard<T>(
         id: boardId,
         title: boardTitle,
         columns: columns,

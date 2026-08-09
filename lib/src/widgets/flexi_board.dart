@@ -2,17 +2,17 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
-import '../controller/board_flow_controller.dart';
-import '../defaults/board_flow_theme.dart';
+import '../controller/flexi_board_controller.dart';
+import '../defaults/flexi_board_theme.dart';
 import '../defaults/default_card.dart';
 import '../models/drag_events.dart';
 import '../models/move.dart';
 import '../models/workspace.dart';
-import '../physics/board_flow_physics.dart';
+import '../physics/flexi_board_physics.dart';
 import '../physics/drag_session.dart';
 import '../policies/wip_policy.dart';
 import 'board_canvas.dart';
-import 'board_flow_scope.dart';
+import 'flexi_board_scope.dart';
 import 'board_tab_strip.dart';
 import 'side_by_side_layout.dart';
 
@@ -20,14 +20,14 @@ import 'side_by_side_layout.dart';
 ///
 /// Hosts own data (or pass [controller]). Cards are fully customizable via
 /// builders; when omitted, default Material chrome is used.
-class BoardFlow<T> extends StatefulWidget {
-  const BoardFlow({
+class FlexiBoard<T> extends StatefulWidget {
+  const FlexiBoard({
     super.key,
     this.workspace,
     this.controller,
-    this.layout = BoardFlowLayout.single,
+    this.layout = FlexiBoardLayout.single,
     this.activeBoardId,
-    this.physics = BoardFlowPhysics.standard,
+    this.physics = FlexiBoardPhysics.standard,
     this.policies,
     this.theme,
     this.cardBuilder,
@@ -47,40 +47,40 @@ class BoardFlow<T> extends StatefulWidget {
         );
 
   /// Controlled data. Ignored when [controller] is non-null.
-  final BoardFlowWorkspace<T>? workspace;
+  final FlexiBoardWorkspace<T>? workspace;
 
   /// Optional convenience state owner with undo/redo.
-  final BoardFlowController<T>? controller;
+  final FlexiBoardController<T>? controller;
 
-  final BoardFlowLayout layout;
+  final FlexiBoardLayout layout;
   final String? activeBoardId;
-  final BoardFlowPhysics physics;
-  final BoardFlowPolicies<T>? policies;
-  final BoardFlowTheme? theme;
+  final FlexiBoardPhysics physics;
+  final FlexiBoardPolicies<T>? policies;
+  final FlexiBoardTheme? theme;
 
-  final BoardFlowCardBuilder<T>? cardBuilder;
-  final BoardFlowColumnHeaderBuilder<T>? columnHeaderBuilder;
-  final BoardFlowColumnFooterBuilder<T>? columnFooterBuilder;
-  final BoardFlowBoardTabBuilder<T>? boardTabBuilder;
-  final BoardFlowEmptyColumnBuilder<T>? emptyColumnBuilder;
-  final BoardFlowSwimlaneHeaderBuilder<T>? swimlaneHeaderBuilder;
+  final FlexiBoardCardBuilder<T>? cardBuilder;
+  final FlexiBoardColumnHeaderBuilder<T>? columnHeaderBuilder;
+  final FlexiBoardColumnFooterBuilder<T>? columnFooterBuilder;
+  final FlexiBoardBoardTabBuilder<T>? boardTabBuilder;
+  final FlexiBoardEmptyColumnBuilder<T>? emptyColumnBuilder;
+  final FlexiBoardSwimlaneHeaderBuilder<T>? swimlaneHeaderBuilder;
 
-  /// Drag lifecycle: [BoardFlowDragPhase.started] / [BoardFlowDragPhase.updated].
-  final BoardFlowDragCallback<T>? onDrag;
+  /// Drag lifecycle: [FlexiBoardDragPhase.started] / [FlexiBoardDragPhase.updated].
+  final FlexiBoardDragCallback<T>? onDrag;
 
   /// Drop result: accepted move or cancelled / rejected / no-op.
-  final BoardFlowDropCallback<T>? onDrop;
+  final FlexiBoardDropCallback<T>? onDrop;
 
   /// Fired only when a drop is accepted (same move as [onDrop] when accepted).
-  final ValueChanged<BoardFlowMove<T>>? onCardMoved;
-  final ValueChanged<BoardFlowColumnReorder>? onColumnReordered;
+  final ValueChanged<FlexiBoardMove<T>>? onCardMoved;
+  final ValueChanged<FlexiBoardColumnReorder>? onColumnReordered;
   final ValueChanged<String>? onActiveBoardChanged;
 
   @override
-  State<BoardFlow<T>> createState() => _BoardFlowState<T>();
+  State<FlexiBoard<T>> createState() => _FlexiBoardState<T>();
 }
 
-class _BoardFlowState<T> extends State<BoardFlow<T>> {
+class _FlexiBoardState<T> extends State<FlexiBoard<T>> {
   final DragSession _dragSession = DragSession();
   final DropRegistry<T> _dropRegistry = DropRegistry<T>();
   final TabHitRegistry _tabRegistry = TabHitRegistry();
@@ -97,7 +97,7 @@ class _BoardFlowState<T> extends State<BoardFlow<T>> {
   String? _lastHoverColumnId;
   int? _lastHoverIndex;
 
-  BoardFlowWorkspace<T> get _workspace {
+  FlexiBoardWorkspace<T> get _workspace {
     if (widget.controller != null) return widget.controller!.workspace;
     return widget.workspace!;
   }
@@ -108,10 +108,10 @@ class _BoardFlowState<T> extends State<BoardFlow<T>> {
         _workspace.resolvedActiveBoardId;
   }
 
-  BoardFlowPolicies<T> get _policies =>
+  FlexiBoardPolicies<T> get _policies =>
       widget.policies ??
       widget.controller?.policies ??
-      BoardFlowPolicies<T>();
+      FlexiBoardPolicies<T>();
 
   @override
   void initState() {
@@ -121,7 +121,7 @@ class _BoardFlowState<T> extends State<BoardFlow<T>> {
   }
 
   @override
-  void didUpdateWidget(covariant BoardFlow<T> oldWidget) {
+  void didUpdateWidget(covariant FlexiBoard<T> oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.controller != widget.controller) {
       oldWidget.controller?.removeListener(_onControllerChanged);
@@ -155,7 +155,7 @@ class _BoardFlowState<T> extends State<BoardFlow<T>> {
         _lastHoverBoardId = _dragSession.hoverBoardId;
         _lastHoverColumnId = _dragSession.hoverColumnId;
         _lastHoverIndex = _dragSession.hoverIndex;
-        _emitDrag(BoardFlowDragPhase.started);
+        _emitDrag(FlexiBoardDragPhase.started);
       } else {
         final hoverChanged = _dragSession.hoverBoardId != _lastHoverBoardId ||
             _dragSession.hoverColumnId != _lastHoverColumnId ||
@@ -164,7 +164,7 @@ class _BoardFlowState<T> extends State<BoardFlow<T>> {
           _lastHoverBoardId = _dragSession.hoverBoardId;
           _lastHoverColumnId = _dragSession.hoverColumnId;
           _lastHoverIndex = _dragSession.hoverIndex;
-          _emitDrag(BoardFlowDragPhase.updated);
+          _emitDrag(FlexiBoardDragPhase.updated);
         }
       }
       _ensureOverlay();
@@ -183,7 +183,7 @@ class _BoardFlowState<T> extends State<BoardFlow<T>> {
     }
   }
 
-  void _emitDrag(BoardFlowDragPhase phase) {
+  void _emitDrag(FlexiBoardDragPhase phase) {
     final callback = widget.onDrag;
     if (callback == null) return;
     final cardId = _dragSession.cardId;
@@ -197,7 +197,7 @@ class _BoardFlowState<T> extends State<BoardFlow<T>> {
     final card = findCardInWorkspace<T>(_workspace.boards, cardId);
     if (card == null) return;
     callback(
-      BoardFlowDragDetails<T>(
+      FlexiBoardDragDetails<T>(
         phase: phase,
         card: card,
         boardId: _dragSession.fromBoardId!,
@@ -235,9 +235,9 @@ class _BoardFlowState<T> extends State<BoardFlow<T>> {
         findCardInWorkspace<T>(_workspace.boards, _dragSession.cardId!);
     if (card == null) return const SizedBox.shrink();
 
-    final theme = widget.theme ?? BoardFlowTheme.fromContext(context);
+    final theme = widget.theme ?? FlexiBoardTheme.fromContext(context);
     final size = _dragSession.feedbackSize ?? const Size(260, 64);
-    final details = const BoardFlowCardDragDetails(
+    final details = const FlexiBoardCardDragDetails(
       isDragging: true,
       isGhost: false,
     );
@@ -300,7 +300,7 @@ class _BoardFlowState<T> extends State<BoardFlow<T>> {
   }
 
   void _handleTabHover(Offset global) {
-    if (widget.layout != BoardFlowLayout.tabs) return;
+    if (widget.layout != FlexiBoardLayout.tabs) return;
 
     final boardId = _tabRegistry.boardIdAt(global);
     if (boardId != _hoveredTabBoardId) {
@@ -357,8 +357,8 @@ class _BoardFlowState<T> extends State<BoardFlow<T>> {
 
     if (!accepted) {
       widget.onDrag?.call(
-        BoardFlowDragDetails<T>(
-          phase: BoardFlowDragPhase.cancelled,
+        FlexiBoardDragDetails<T>(
+          phase: FlexiBoardDragPhase.cancelled,
           card: card,
           boardId: fromBoardId ?? move?.fromBoardId ?? '',
           columnId: fromColumnId ?? move?.fromColumnId ?? '',
@@ -367,7 +367,7 @@ class _BoardFlowState<T> extends State<BoardFlow<T>> {
         ),
       );
       widget.onDrop?.call(
-        BoardFlowDropDetails<T>(
+        FlexiBoardDropDetails<T>(
           card: card,
           accepted: false,
           move: null,
@@ -380,7 +380,7 @@ class _BoardFlowState<T> extends State<BoardFlow<T>> {
       widget.controller!.moveCard(move);
     }
     widget.onDrop?.call(
-      BoardFlowDropDetails<T>(
+      FlexiBoardDropDetails<T>(
         card: card,
         accepted: true,
         move: move,
@@ -409,8 +409,8 @@ class _BoardFlowState<T> extends State<BoardFlow<T>> {
     }
 
     widget.onDrag?.call(
-      BoardFlowDragDetails<T>(
-        phase: BoardFlowDragPhase.cancelled,
+      FlexiBoardDragDetails<T>(
+        phase: FlexiBoardDragPhase.cancelled,
         card: card,
         boardId: fromBoardId,
         columnId: fromColumnId,
@@ -419,7 +419,7 @@ class _BoardFlowState<T> extends State<BoardFlow<T>> {
       ),
     );
     widget.onDrop?.call(
-      BoardFlowDropDetails<T>(
+      FlexiBoardDropDetails<T>(
         card: card,
         accepted: false,
         move: null,
@@ -429,9 +429,9 @@ class _BoardFlowState<T> extends State<BoardFlow<T>> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = widget.theme ?? BoardFlowTheme.fromContext(context);
+    final theme = widget.theme ?? FlexiBoardTheme.fromContext(context);
 
-    final body = BoardFlowScope<T>(
+    final body = FlexiBoardScope<T>(
       workspace: _workspace,
       physics: widget.physics,
       policies: _policies,
@@ -502,12 +502,12 @@ class _BoardFlowState<T> extends State<BoardFlow<T>> {
     }
 
     switch (widget.layout) {
-      case BoardFlowLayout.sideBySide:
+      case FlexiBoardLayout.sideBySide:
         return SideBySideLayout<T>(
           boards: boards,
           dropRegistry: _dropRegistry,
         );
-      case BoardFlowLayout.tabs:
+      case FlexiBoardLayout.tabs:
         final activeId = _activeBoardId;
         final board = _workspace.boardById(activeId) ?? boards.first;
         return Column(
@@ -529,7 +529,7 @@ class _BoardFlowState<T> extends State<BoardFlow<T>> {
             ),
           ],
         );
-      case BoardFlowLayout.single:
+      case FlexiBoardLayout.single:
         final board = boards.length == 1
             ? boards.first
             : (_workspace.boardById(_activeBoardId) ?? boards.first);

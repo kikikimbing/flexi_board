@@ -1,51 +1,51 @@
 import 'package:flutter/widgets.dart';
 
-import '../defaults/board_flow_theme.dart';
+import '../defaults/flexi_board_theme.dart';
 import '../models/board.dart';
 import '../models/card.dart';
 import '../models/column.dart';
 import '../models/move.dart';
 import '../models/workspace.dart';
-import '../physics/board_flow_physics.dart';
+import '../physics/flexi_board_physics.dart';
 import '../physics/drag_session.dart';
 import '../policies/wip_policy.dart';
 
-typedef BoardFlowCardBuilder<T> = Widget Function(
+typedef FlexiBoardCardBuilder<T> = Widget Function(
   BuildContext context,
-  BoardFlowCard<T> card,
-  BoardFlowCardDragDetails details,
+  FlexiBoardCard<T> card,
+  FlexiBoardCardDragDetails details,
 );
 
-typedef BoardFlowColumnHeaderBuilder<T> = Widget Function(
+typedef FlexiBoardColumnHeaderBuilder<T> = Widget Function(
   BuildContext context,
-  BoardFlowColumn<T> column,
+  FlexiBoardColumn<T> column,
 );
 
-typedef BoardFlowColumnFooterBuilder<T> = Widget Function(
+typedef FlexiBoardColumnFooterBuilder<T> = Widget Function(
   BuildContext context,
-  BoardFlowColumn<T> column,
+  FlexiBoardColumn<T> column,
 );
 
-typedef BoardFlowBoardTabBuilder<T> = Widget Function(
+typedef FlexiBoardBoardTabBuilder<T> = Widget Function(
   BuildContext context,
-  BoardFlowBoard<T> board,
+  FlexiBoardBoard<T> board,
   bool selected,
   bool dragHover,
 );
 
-typedef BoardFlowEmptyColumnBuilder<T> = Widget Function(
+typedef FlexiBoardEmptyColumnBuilder<T> = Widget Function(
   BuildContext context,
-  BoardFlowColumn<T> column,
+  FlexiBoardColumn<T> column,
 );
 
-typedef BoardFlowSwimlaneHeaderBuilder<T> = Widget Function(
+typedef FlexiBoardSwimlaneHeaderBuilder<T> = Widget Function(
   BuildContext context,
   String swimlaneId,
   String title,
 );
 
-class BoardFlowCardDragDetails {
-  const BoardFlowCardDragDetails({
+class FlexiBoardCardDragDetails {
+  const FlexiBoardCardDragDetails({
     required this.isDragging,
     required this.isGhost,
   });
@@ -54,7 +54,7 @@ class BoardFlowCardDragDetails {
   final bool isGhost;
 }
 
-enum BoardFlowLayout {
+enum FlexiBoardLayout {
   /// Shows only the active board (or the sole board).
   single,
 
@@ -65,8 +65,8 @@ enum BoardFlowLayout {
   sideBySide,
 }
 
-class BoardFlowScope<T> extends InheritedWidget {
-  const BoardFlowScope({
+class FlexiBoardScope<T> extends InheritedWidget {
+  const FlexiBoardScope({
     super.key,
     required this.workspace,
     required this.physics,
@@ -87,36 +87,36 @@ class BoardFlowScope<T> extends InheritedWidget {
     required super.child,
   });
 
-  final BoardFlowWorkspace<T> workspace;
-  final BoardFlowPhysics physics;
-  final BoardFlowPolicies<T> policies;
-  final BoardFlowTheme theme;
+  final FlexiBoardWorkspace<T> workspace;
+  final FlexiBoardPhysics physics;
+  final FlexiBoardPolicies<T> policies;
+  final FlexiBoardTheme theme;
   final DragSession dragSession;
-  final BoardFlowLayout layout;
-  final ValueChanged<BoardFlowMove<T>>? onCardMoved;
-  final ValueChanged<BoardFlowColumnReorder>? onColumnReordered;
+  final FlexiBoardLayout layout;
+  final ValueChanged<FlexiBoardMove<T>>? onCardMoved;
+  final ValueChanged<FlexiBoardColumnReorder>? onColumnReordered;
   final ValueChanged<String>? onActiveBoardChanged;
-  final BoardFlowCardBuilder<T>? cardBuilder;
-  final BoardFlowColumnHeaderBuilder<T>? columnHeaderBuilder;
-  final BoardFlowColumnFooterBuilder<T>? columnFooterBuilder;
-  final BoardFlowBoardTabBuilder<T>? boardTabBuilder;
-  final BoardFlowEmptyColumnBuilder<T>? emptyColumnBuilder;
-  final BoardFlowSwimlaneHeaderBuilder<T>? swimlaneHeaderBuilder;
+  final FlexiBoardCardBuilder<T>? cardBuilder;
+  final FlexiBoardColumnHeaderBuilder<T>? columnHeaderBuilder;
+  final FlexiBoardColumnFooterBuilder<T>? columnFooterBuilder;
+  final FlexiBoardBoardTabBuilder<T>? boardTabBuilder;
+  final FlexiBoardEmptyColumnBuilder<T>? emptyColumnBuilder;
+  final FlexiBoardSwimlaneHeaderBuilder<T>? swimlaneHeaderBuilder;
   final ValueChanged<String> requestActiveBoard;
 
-  static BoardFlowScope<T> of<T>(BuildContext context) {
+  static FlexiBoardScope<T> of<T>(BuildContext context) {
     final scope =
-        context.dependOnInheritedWidgetOfExactType<BoardFlowScope<T>>();
-    assert(scope != null, 'BoardFlowScope<$T> not found in context');
+        context.dependOnInheritedWidgetOfExactType<FlexiBoardScope<T>>();
+    assert(scope != null, 'FlexiBoardScope<$T> not found in context');
     return scope!;
   }
 
-  static BoardFlowScope<T>? maybeOf<T>(BuildContext context) {
-    return context.dependOnInheritedWidgetOfExactType<BoardFlowScope<T>>();
+  static FlexiBoardScope<T>? maybeOf<T>(BuildContext context) {
+    return context.dependOnInheritedWidgetOfExactType<FlexiBoardScope<T>>();
   }
 
   @override
-  bool updateShouldNotify(BoardFlowScope<T> oldWidget) {
+  bool updateShouldNotify(FlexiBoardScope<T> oldWidget) {
     return workspace != oldWidget.workspace ||
         physics != oldWidget.physics ||
         policies != oldWidget.policies ||

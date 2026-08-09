@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
 /// Visual tokens for default board chrome.
-class BoardFlowTheme {
-  const BoardFlowTheme({
+class FlexiBoardTheme {
+  const FlexiBoardTheme({
     this.boardBackgroundColor,
     this.columnBackgroundColor,
     this.columnHeaderColor,
@@ -34,9 +34,9 @@ class BoardFlowTheme {
   final double cardBorderRadius;
   final double cardElevation;
 
-  factory BoardFlowTheme.fromContext(BuildContext context) {
+  factory FlexiBoardTheme.fromContext(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    return BoardFlowTheme(
+    return FlexiBoardTheme(
       boardBackgroundColor: scheme.surfaceContainerLowest,
       columnBackgroundColor: scheme.surfaceContainerLow,
       columnHeaderColor: scheme.surfaceContainer,
@@ -51,7 +51,7 @@ class BoardFlowTheme {
     );
   }
 
-  BoardFlowTheme copyWith({
+  FlexiBoardTheme copyWith({
     Color? boardBackgroundColor,
     Color? columnBackgroundColor,
     Color? columnHeaderColor,
@@ -67,7 +67,7 @@ class BoardFlowTheme {
     double? cardBorderRadius,
     double? cardElevation,
   }) {
-    return BoardFlowTheme(
+    return FlexiBoardTheme(
       boardBackgroundColor: boardBackgroundColor ?? this.boardBackgroundColor,
       columnBackgroundColor:
           columnBackgroundColor ?? this.columnBackgroundColor,
