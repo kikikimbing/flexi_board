@@ -1,3 +1,3 @@
-## 0.0.1
+## 0.1.0
 
-* TODO: Describe initial release.
+* Initial board_flow release: multi-board DnD, default UI, WIP, undo, swimlanes.
