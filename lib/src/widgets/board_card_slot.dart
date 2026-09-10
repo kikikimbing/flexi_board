@@ -33,17 +33,19 @@ class _BoardCardSlotState<T> extends State<BoardCardSlot<T>> {
   Widget build(BuildContext context) {
     final scope = FlexiBoardScope.of<T>(context);
     final session = scope.dragSession;
-    final isGhost = session.active && session.cardId == widget.card.id;
+    final isSource = session.active && session.cardId == widget.card.id;
+    // Stay-in-place keeps a live source; ghost mode removes the slot so
+    // isGhost is only meaningful when keepSourceCardVisible is on and false.
     final details = FlexiBoardCardDragDetails(
-      isDragging: isGhost,
-      isGhost: isGhost,
+      isDragging: isSource,
+      isGhost: isSource && !scope.physics.keepSourceCardVisible,
     );
 
     final child = scope.cardBuilder?.call(context, widget.card, details) ??
         DefaultBoardCard<T>(
           card: widget.card,
           theme: scope.theme,
-          isDragging: isGhost,
+          isDragging: isSource,
         );
 
     return Listener(

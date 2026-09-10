@@ -336,4 +336,139 @@ void main() {
 
     expect(started, isTrue);
   });
+
+  testWidgets('columnListWrapper receives the column list widget', (tester) async {
+    String? wrappedColumnId;
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: FlexiBoard<String>(
+            workspace: FlexiBoardWorkspace<String>(
+              boards: [
+                FlexiBoardBoard<String>(
+                  id: 'b1',
+                  title: 'Main',
+                  columns: [
+                    FlexiBoardColumn<String>(
+                      id: 'todo',
+                      title: 'Todo',
+                      cards: const [
+                        FlexiBoardCard(id: 'c1', data: 'Wrapped'),
+                      ],
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            columnListWrapper: (context, column, list) {
+              wrappedColumnId = column.id;
+              return KeyedSubtree(
+                key: const ValueKey('wrapped-list'),
+                child: list,
+              );
+            },
+          ),
+        ),
+      ),
+    );
+
+    expect(wrappedColumnId, 'todo');
+    expect(find.byKey(const ValueKey('wrapped-list')), findsOneWidget);
+    expect(find.text('Wrapped'), findsOneWidget);
+  });
+
+  testWidgets(
+      'keepSourceCardVisible leaves source card in the list while dragging',
+      (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: FlexiBoard<String>(
+            workspace: FlexiBoardWorkspace<String>(
+              boards: [
+                FlexiBoardBoard<String>(
+                  id: 'b1',
+                  title: 'Main',
+                  columns: [
+                    FlexiBoardColumn<String>(
+                      id: 'todo',
+                      title: 'Todo',
+                      cards: const [
+                        FlexiBoardCard(id: 'c1', data: 'Stay'),
+                        FlexiBoardCard(id: 'c2', data: 'Other'),
+                      ],
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            physics: const FlexiBoardPhysics(
+              longPressDelay: Duration(milliseconds: 50),
+              keepSourceCardVisible: true,
+            ),
+          ),
+        ),
+      ),
+    );
+
+    expect(find.text('Stay'), findsOneWidget);
+
+    final gesture =
+        await tester.startGesture(tester.getCenter(find.text('Stay')));
+    await tester.pump(const Duration(milliseconds: 80));
+    await tester.pump();
+
+    // Source remains in the column list; overlay also paints a feedback copy.
+    expect(find.text('Stay'), findsNWidgets(2));
+    expect(find.text('Other'), findsOneWidget);
+
+    await gesture.up();
+    await tester.pumpAndSettle();
+  });
+
+  testWidgets(
+      'default drag collapses source card in the column list',
+      (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: FlexiBoard<String>(
+            workspace: FlexiBoardWorkspace<String>(
+              boards: [
+                FlexiBoardBoard<String>(
+                  id: 'b1',
+                  title: 'Main',
+                  columns: [
+                    FlexiBoardColumn<String>(
+                      id: 'todo',
+                      title: 'Todo',
+                      cards: const [
+                        FlexiBoardCard(id: 'c1', data: 'Gone'),
+                        FlexiBoardCard(id: 'c2', data: 'Other'),
+                      ],
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            physics: const FlexiBoardPhysics(
+              longPressDelay: Duration(milliseconds: 50),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    final gesture =
+        await tester.startGesture(tester.getCenter(find.text('Gone')));
+    await tester.pump(const Duration(milliseconds: 80));
+    await tester.pump();
+
+    // Collapsed in the list; only the floating overlay still shows "Gone".
+    expect(find.text('Gone'), findsOneWidget);
+    expect(find.text('Other'), findsOneWidget);
+
+    await gesture.up();
+    await tester.pumpAndSettle();
+  });
 }
