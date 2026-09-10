@@ -1,3 +1,9 @@
+## 0.3.0
+
+* Add `FlexiBoardPolicies.canStartDrag` so hosts can block pickup (freeze /
+  permission) before a drag session starts — no lift-then-bounce when the
+  card must not move. `canAcceptDrop` remains the target-side gate.
+
 ## 0.2.0
 
 * Add `FlexiBoardLayout.paged`: PageView of columns with side peek and edge

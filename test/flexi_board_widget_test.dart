@@ -242,4 +242,98 @@ void main() {
     expect(drop.accepted, isFalse);
     expect(drop.move, isNull);
   });
+
+  testWidgets('canStartDrag false prevents drag start (no lift)', (tester) async {
+    var started = false;
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: FlexiBoard<String>(
+            workspace: FlexiBoardWorkspace<String>(
+              boards: [
+                FlexiBoardBoard<String>(
+                  id: 'b1',
+                  title: 'Main',
+                  columns: [
+                    FlexiBoardColumn<String>(
+                      id: 'todo',
+                      title: 'Todo',
+                      cards: const [
+                        FlexiBoardCard(id: 'c1', data: 'Frozen'),
+                      ],
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            policies: FlexiBoardPolicies<String>(
+              canStartDrag: (card, workspace) => false,
+            ),
+            physics: const FlexiBoardPhysics(
+              longPressDelay: Duration(milliseconds: 50),
+            ),
+            onDrag: (details) {
+              if (details.phase == FlexiBoardDragPhase.started) {
+                started = true;
+              }
+            },
+          ),
+        ),
+      ),
+    );
+
+    final gesture = await tester.startGesture(tester.getCenter(find.text('Frozen')));
+    await tester.pump(const Duration(milliseconds: 80));
+    await gesture.up();
+    await tester.pumpAndSettle();
+
+    expect(started, isFalse);
+  });
+
+  testWidgets('canStartDrag true still allows drag start', (tester) async {
+    var started = false;
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: FlexiBoard<String>(
+            workspace: FlexiBoardWorkspace<String>(
+              boards: [
+                FlexiBoardBoard<String>(
+                  id: 'b1',
+                  title: 'Main',
+                  columns: [
+                    FlexiBoardColumn<String>(
+                      id: 'todo',
+                      title: 'Todo',
+                      cards: const [
+                        FlexiBoardCard(id: 'c1', data: 'Movable'),
+                      ],
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            policies: FlexiBoardPolicies<String>(
+              canStartDrag: (card, workspace) => true,
+            ),
+            physics: const FlexiBoardPhysics(
+              longPressDelay: Duration(milliseconds: 50),
+            ),
+            onDrag: (details) {
+              if (details.phase == FlexiBoardDragPhase.started) {
+                started = true;
+              }
+            },
+          ),
+        ),
+      ),
+    );
+
+    final gesture = await tester.startGesture(tester.getCenter(find.text('Movable')));
+    await tester.pump(const Duration(milliseconds: 80));
+    await gesture.up();
+    await tester.pumpAndSettle();
+
+    expect(started, isTrue);
+  });
 }

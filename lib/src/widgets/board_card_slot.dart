@@ -62,6 +62,12 @@ class _BoardCardSlotState<T> extends State<BoardCardSlot<T>> {
             return;
           }
           if (scope.dragSession.active) return;
+          if (!scope.policies.allowsStartDrag(widget.card, scope.workspace)) {
+            _cancelled = true;
+            _pointer = null;
+            _startPosition = null;
+            return;
+          }
           final box = _key.currentContext?.findRenderObject() as RenderBox?;
           final size = box?.size ?? const Size(240, 64);
           setState(() => _dragging = true);

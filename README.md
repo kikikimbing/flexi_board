@@ -14,7 +14,7 @@ Plug-and-play **multi-board drag-and-drop** for Flutter.
 
 ```yaml
 dependencies:
-  flexi_board: ^0.2.0
+  flexi_board: ^0.3.0
 ```
 
 ```bash
@@ -119,11 +119,17 @@ FlexiBoard(
   policies: FlexiBoardPolicies(
     wipEnabled: true,
     allowColumnReorder: true,
+    // Source: do not lift frozen / locked cards
+    canStartDrag: (card, workspace) => card.id != 'locked',
+    // Target: WIP, invalid column, etc.
     canAcceptDrop: (move, workspace) => true,
   ),
   ...
 );
 ```
+
+- `canStartDrag` — evaluated **before** drag starts (no lift / bounce-back)
+- `canAcceptDrop` — evaluated on hover/drop (reject the target after lift)
 
 Set `wipLimit` on a column to enforce capacity when WIP is enabled.
 
