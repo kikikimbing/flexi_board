@@ -26,6 +26,14 @@ typedef FlexiBoardColumnFooterBuilder<T> = Widget Function(
   FlexiBoardColumn<T> column,
 );
 
+/// Wraps a column’s vertical card [list] (the same ListView used for cards
+/// and placeholders). Use for pull-to-refresh, infinite scroll, etc.
+typedef FlexiBoardColumnListWrapper<T> = Widget Function(
+  BuildContext context,
+  FlexiBoardColumn<T> column,
+  Widget list,
+);
+
 typedef FlexiBoardBoardTabBuilder<T> = Widget Function(
   BuildContext context,
   FlexiBoardBoard<T> board,
@@ -83,6 +91,7 @@ class FlexiBoardScope<T> extends InheritedWidget {
     required this.cardBuilder,
     required this.columnHeaderBuilder,
     required this.columnFooterBuilder,
+    required this.columnListWrapper,
     required this.boardTabBuilder,
     required this.emptyColumnBuilder,
     required this.swimlaneHeaderBuilder,
@@ -102,6 +111,7 @@ class FlexiBoardScope<T> extends InheritedWidget {
   final FlexiBoardCardBuilder<T>? cardBuilder;
   final FlexiBoardColumnHeaderBuilder<T>? columnHeaderBuilder;
   final FlexiBoardColumnFooterBuilder<T>? columnFooterBuilder;
+  final FlexiBoardColumnListWrapper<T>? columnListWrapper;
   final FlexiBoardBoardTabBuilder<T>? boardTabBuilder;
   final FlexiBoardEmptyColumnBuilder<T>? emptyColumnBuilder;
   final FlexiBoardSwimlaneHeaderBuilder<T>? swimlaneHeaderBuilder;

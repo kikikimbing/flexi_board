@@ -14,7 +14,7 @@ Plug-and-play **multi-board drag-and-drop** for Flutter.
 
 ```yaml
 dependencies:
-  flexi_board: ^0.3.0
+  flexi_board: ^0.4.0
 ```
 
 ```bash
@@ -108,6 +108,40 @@ Use `FlexiBoardPhysics.snappy` so entering another board snaps the hover (and fl
 FlexiBoard(
   physics: FlexiBoardPhysics.snappy,
   layout: FlexiBoardLayout.sideBySide,
+  ...
+);
+```
+
+## Column list wrapper (refresh / load-more)
+
+Wrap each column’s vertical list — not the whole board or horizontal pager:
+
+```dart
+FlexiBoard(
+  columnListWrapper: (context, column, list) {
+    return RefreshIndicator(
+      onRefresh: () => onRefresh(column.id),
+      child: NotificationListener<ScrollNotification>(
+        onNotification: (notification) {
+          // load more when near the end
+          return false;
+        },
+        child: list,
+      ),
+    );
+  },
+  ...
+);
+```
+
+## Stay-in-place source card
+
+Default drag removes the source and shows a placeholder ghost. Opt into
+LongPressDraggable-style stay-in-place:
+
+```dart
+FlexiBoard(
+  physics: const FlexiBoardPhysics(keepSourceCardVisible: true),
   ...
 );
 ```

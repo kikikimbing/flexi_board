@@ -126,8 +126,11 @@ class BoardColumnViewState<T> extends State<BoardColumnView<T>> {
           : listBox.globalToLocal(global);
       final sameColumn = session.fromBoardId == widget.boardId &&
           session.fromColumnId == widget.column.id;
-      // Collapse the source card in-layout; centers are only remaining cards.
-      final excludeId = sameColumn ? session.cardId : null;
+      // Collapse the source card in-layout unless stay-in-place is enabled;
+      // centers are only remaining cards when collapsed.
+      final excludeId = sameColumn && !scope.physics.keepSourceCardVisible
+          ? session.cardId
+          : null;
       final centers = _itemCenters(listContext, excludeCardId: excludeId);
       final visibleCount = excludeId == null
           ? widget.cards.length
@@ -254,16 +257,26 @@ class BoardColumnViewState<T> extends State<BoardColumnView<T>> {
                 child: header,
               ),
               Expanded(
-                child: ListView(
-                  key: _listKey,
-                  controller: _scrollController,
-                  padding: const EdgeInsets.fromLTRB(8, 0, 8, 8),
-                  children: _buildChildren(
-                    context,
-                    showPlaceholder,
-                    session.hoverIndex ?? 0,
-                    session.rejected,
-                  ),
+                child: Builder(
+                  builder: (context) {
+                    final list = ListView(
+                      key: _listKey,
+                      controller: _scrollController,
+                      padding: const EdgeInsets.fromLTRB(8, 0, 8, 8),
+                      children: _buildChildren(
+                        context,
+                        showPlaceholder,
+                        session.hoverIndex ?? 0,
+                        session.rejected,
+                      ),
+                    );
+                    return scope.columnListWrapper?.call(
+                          context,
+                          widget.column,
+                          list,
+                        ) ??
+                        list;
+                  },
                 ),
               ),
               if (footer != null) footer,
@@ -289,8 +302,10 @@ class BoardColumnViewState<T> extends State<BoardColumnView<T>> {
     final draggingFromThisColumn = session.active &&
         session.fromBoardId == widget.boardId &&
         session.fromColumnId == widget.column.id;
+    final collapseSource = draggingFromThisColumn &&
+        !scope.physics.keepSourceCardVisible;
     final draggingCardId =
-        draggingFromThisColumn ? session.cardId : null;
+        collapseSource ? session.cardId : null;
 
     if (widget.cards.isEmpty && !showPlaceholder) {
       children.add(
@@ -326,8 +341,9 @@ class BoardColumnViewState<T> extends State<BoardColumnView<T>> {
       );
     }
 
-    // Remaining cards with the in-flight card removed so the list collapses
-    // and the placeholder (not a faded first card) is the drop shadow.
+    // Remaining cards; optionally remove the in-flight card so the list
+    // collapses and the placeholder (not a faded first card) is the drop
+    // shadow. With keepSourceCardVisible the source stays in place.
     final visibleCards = <(int index, FlexiBoardCard<T> card)>[];
     for (var i = 0; i < widget.cards.length; i++) {
       final card = widget.cards[i];

@@ -21,6 +21,7 @@ class FlexiBoardPhysics {
     this.pageSideMargin = 16,
     this.pageEdgeExtent = 80,
     this.pageChangeDuration = const Duration(milliseconds: 400),
+    this.keepSourceCardVisible = false,
   });
 
   final Duration longPressDelay;
@@ -55,6 +56,11 @@ class FlexiBoardPhysics {
 
   /// Duration for animated page changes in [FlexiBoardLayout.paged].
   final Duration pageChangeDuration;
+
+  /// When true, the source card stays in the origin column while dragging
+  /// (LongPressDraggable-style). Default collapses the slot and shows a
+  /// placeholder ghost instead.
+  final bool keepSourceCardVisible;
 
   static const FlexiBoardPhysics standard = FlexiBoardPhysics();
 

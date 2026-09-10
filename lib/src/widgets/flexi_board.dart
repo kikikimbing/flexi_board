@@ -35,6 +35,7 @@ class FlexiBoard<T> extends StatefulWidget {
     this.cardBuilder,
     this.columnHeaderBuilder,
     this.columnFooterBuilder,
+    this.columnListWrapper,
     this.boardTabBuilder,
     this.emptyColumnBuilder,
     this.swimlaneHeaderBuilder,
@@ -68,6 +69,12 @@ class FlexiBoard<T> extends StatefulWidget {
   final FlexiBoardCardBuilder<T>? cardBuilder;
   final FlexiBoardColumnHeaderBuilder<T>? columnHeaderBuilder;
   final FlexiBoardColumnFooterBuilder<T>? columnFooterBuilder;
+
+  /// Optional wrapper around each column’s vertical card list (e.g.
+  /// [RefreshIndicator] or load-more [NotificationListener]). The [list]
+  /// argument is the ListView FlexiBoard builds for cards and placeholders.
+  final FlexiBoardColumnListWrapper<T>? columnListWrapper;
+
   final FlexiBoardBoardTabBuilder<T>? boardTabBuilder;
   final FlexiBoardEmptyColumnBuilder<T>? emptyColumnBuilder;
   final FlexiBoardSwimlaneHeaderBuilder<T>? swimlaneHeaderBuilder;
@@ -464,6 +471,7 @@ class _FlexiBoardState<T> extends State<FlexiBoard<T>> {
       cardBuilder: widget.cardBuilder,
       columnHeaderBuilder: widget.columnHeaderBuilder,
       columnFooterBuilder: widget.columnFooterBuilder,
+      columnListWrapper: widget.columnListWrapper,
       boardTabBuilder: widget.boardTabBuilder,
       emptyColumnBuilder: widget.emptyColumnBuilder,
       swimlaneHeaderBuilder: widget.swimlaneHeaderBuilder,

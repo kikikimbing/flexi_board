@@ -1,3 +1,10 @@
+## 0.4.0
+
+* Add `columnListWrapper` so hosts can wrap each column’s vertical ListView
+  (pull-to-refresh, infinite scroll) without attaching to the horizontal pager.
+* Add `FlexiBoardPhysics.keepSourceCardVisible` for optional stay-in-place
+  source cards while dragging (default remains collapse + placeholder ghost).
+
 ## 0.3.0
 
 * Add `FlexiBoardPolicies.canStartDrag` so hosts can block pickup (freeze /
