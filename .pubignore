@@ -1,0 +1,8 @@
+# Keep the published archive lean; example still ships source + assets fonts.
+example/ios/
+example/.idea/
+example/*.iml
+*.iml
+.idea/
+build/
+coverage/

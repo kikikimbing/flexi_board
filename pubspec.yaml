@@ -4,11 +4,19 @@ description: >-
   with optional default UI, 1..N boards, cross-board moves, WIP, and undo —
   flutter-only, state-management agnostic.
 version: 0.2.0
-homepage: https://github.com/ananta/flexi_board
+homepage: https://github.com/kikikimbing/flexi_board
+repository: https://github.com/kikikimbing/flexi_board
+issue_tracker: https://github.com/kikikimbing/flexi_board/issues
+topics:
+  - flutter
+  - drag-and-drop
+  - kanban
+  - board
+  - ui
 
 environment:
-  sdk: ^3.12.2
-  flutter: ">=1.17.0"
+  sdk: ^3.6.2
+  flutter: ">=3.27.4"
 
 dependencies:
   flutter:
@@ -17,6 +25,10 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^6.0.0
+  flutter_lints: ^5.0.0
 
 flutter:
+
+screenshots:
+  - description: FlexiBoard multi-board drag-and-drop example on iOS.
+    path: doc/flexiboard_example.png

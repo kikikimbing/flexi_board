@@ -14,9 +14,13 @@ Plug-and-play **multi-board drag-and-drop** for Flutter.
 
 ```yaml
 dependencies:
-  flexi_board:
-    path: ../ # or pub version when published
+  flexi_board: ^0.2.0
 ```
+
+```bash
+flutter pub add flexi_board
+```
+
 
 ## Quick start (defaults)
 

@@ -266,7 +266,7 @@ class BoardColumnViewState<T> extends State<BoardColumnView<T>> {
                   ),
                 ),
               ),
-              ?footer,
+              if (footer != null) footer,
             ],
           ),
         );
