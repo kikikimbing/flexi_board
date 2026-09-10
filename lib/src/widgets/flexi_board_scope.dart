@@ -55,7 +55,7 @@ class FlexiBoardCardDragDetails {
 }
 
 enum FlexiBoardLayout {
-  /// Shows only the active board (or the sole board).
+  /// Shows only the active board (or the sole board) as a horizontal canvas.
   single,
 
   /// Tab strip + one visible board; drag over tabs to switch.
@@ -63,6 +63,9 @@ enum FlexiBoardLayout {
 
   /// Multiple boards visible horizontally for cross-board drops.
   sideBySide,
+
+  /// One column per PageView page with side peek; drag near edges to page.
+  paged,
 }
 
 class FlexiBoardScope<T> extends InheritedWidget {
