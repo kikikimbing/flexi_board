@@ -137,6 +137,26 @@ void main() {
     });
   });
 
+  group('canStartDrag policy', () {
+    test('defaults to allowing drag when canStartDrag is null', () {
+      final ws = sampleWorkspace();
+      final policies = FlexiBoardPolicies<String>();
+      final card = ws.boards.first.columns.first.cards.first;
+      expect(policies.allowsStartDrag(card, ws), isTrue);
+    });
+
+    test('honors host canStartDrag gate', () {
+      final ws = sampleWorkspace();
+      final policies = FlexiBoardPolicies<String>(
+        canStartDrag: (card, workspace) => card.id != 'c1',
+      );
+      final frozen = ws.boards.first.columns.first.cards.first;
+      final movable = ws.boards.first.columns.first.cards[1];
+      expect(policies.allowsStartDrag(frozen, ws), isFalse);
+      expect(policies.allowsStartDrag(movable, ws), isTrue);
+    });
+  });
+
   group('FlexiBoardController', () {
     test('undo and redo restore workspace', () {
       final controller = FlexiBoardController<String>(
