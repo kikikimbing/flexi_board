@@ -14,6 +14,7 @@ import '../policies/wip_policy.dart';
 import 'board_canvas.dart';
 import 'flexi_board_scope.dart';
 import 'board_tab_strip.dart';
+import 'paged_board_canvas.dart';
 import 'side_by_side_layout.dart';
 
 /// Plug-and-play multi-board drag-and-drop surface.
@@ -27,6 +28,7 @@ class FlexiBoard<T> extends StatefulWidget {
     this.controller,
     this.layout = FlexiBoardLayout.single,
     this.activeBoardId,
+    this.activeColumnId,
     this.physics = FlexiBoardPhysics.standard,
     this.policies,
     this.theme,
@@ -41,6 +43,7 @@ class FlexiBoard<T> extends StatefulWidget {
     this.onCardMoved,
     this.onColumnReordered,
     this.onActiveBoardChanged,
+    this.onActiveColumnChanged,
   }) : assert(
           workspace != null || controller != null,
           'Provide workspace or controller',
@@ -54,6 +57,10 @@ class FlexiBoard<T> extends StatefulWidget {
 
   final FlexiBoardLayout layout;
   final String? activeBoardId;
+
+  /// Initial / controlled column id for [FlexiBoardLayout.paged].
+  final String? activeColumnId;
+
   final FlexiBoardPhysics physics;
   final FlexiBoardPolicies<T>? policies;
   final FlexiBoardTheme? theme;
@@ -75,6 +82,9 @@ class FlexiBoard<T> extends StatefulWidget {
   final ValueChanged<FlexiBoardMove<T>>? onCardMoved;
   final ValueChanged<FlexiBoardColumnReorder>? onColumnReordered;
   final ValueChanged<String>? onActiveBoardChanged;
+
+  /// Fired when the paged layout changes the visible column (swipe or edge page).
+  final ValueChanged<String>? onActiveColumnChanged;
 
   @override
   State<FlexiBoard<T>> createState() => _FlexiBoardState<T>();
@@ -528,6 +538,17 @@ class _FlexiBoardState<T> extends State<FlexiBoard<T>> {
               ),
             ),
           ],
+        );
+      case FlexiBoardLayout.paged:
+        final board = boards.length == 1
+            ? boards.first
+            : (_workspace.boardById(_activeBoardId) ?? boards.first);
+        return PagedBoardCanvas<T>(
+          boardId: board.id,
+          columns: board.columns,
+          dropRegistry: _dropRegistry,
+          activeColumnId: widget.activeColumnId,
+          onActiveColumnChanged: widget.onActiveColumnChanged,
         );
       case FlexiBoardLayout.single:
         final board = boards.length == 1

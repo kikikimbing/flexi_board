@@ -594,6 +594,7 @@ class _LayoutSwitcher extends StatelessWidget {
       (FlexiBoardLayout.single, 'One', Icons.crop_portrait_rounded),
       (FlexiBoardLayout.tabs, 'Tabs', Icons.tab_rounded),
       (FlexiBoardLayout.sideBySide, 'Split', Icons.view_column_rounded),
+      (FlexiBoardLayout.paged, 'Paged', Icons.view_carousel_rounded),
     ];
 
     return Container(

@@ -127,7 +127,8 @@ void main() {
     expect(find.text('Alpha card'), findsNothing);
   });
 
-  testWidgets('custom boardTabBuilder still switches boards on tap', (tester) async {
+  testWidgets('custom boardTabBuilder still switches boards on tap',
+      (tester) async {
     await tester.pumpWidget(
       MaterialApp(
         home: Scaffold(
@@ -171,6 +172,55 @@ void main() {
     await tester.tap(find.text('Beta'));
     await tester.pumpAndSettle();
     expect(find.text('B'), findsOneWidget);
+  });
+
+  testWidgets(
+      'paged layout shows one column at a time and reports page changes',
+      (tester) async {
+    String? activeColumn;
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: FlexiBoard<String>(
+            workspace: FlexiBoardWorkspace<String>(
+              boards: [
+                FlexiBoardBoard<String>(
+                  id: 'b1',
+                  title: 'Main',
+                  columns: const [
+                    FlexiBoardColumn(
+                      id: 'todo',
+                      title: 'Todo',
+                      cards: [
+                        FlexiBoardCard(id: 'c1', data: 'Todo card'),
+                      ],
+                    ),
+                    FlexiBoardColumn(
+                      id: 'done',
+                      title: 'Done',
+                      cards: [
+                        FlexiBoardCard(id: 'c2', data: 'Done card'),
+                      ],
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            layout: FlexiBoardLayout.paged,
+            activeColumnId: 'todo',
+            onActiveColumnChanged: (id) => activeColumn = id,
+          ),
+        ),
+      ),
+    );
+
+    expect(find.text('Todo card'), findsOneWidget);
+
+    await tester.drag(find.byType(PageView), const Offset(-400, 0));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Done card').hitTestable(), findsOneWidget);
+    expect(activeColumn, 'done');
   });
 
   test('drag and drop detail types expose phase and acceptance', () {

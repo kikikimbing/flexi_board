@@ -18,6 +18,9 @@ class FlexiBoardPhysics {
     this.columnSpacing = 12,
     this.snapOnBoardEnter = false,
     this.snapFeedbackToPlaceholder = false,
+    this.pageSideMargin = 16,
+    this.pageEdgeExtent = 80,
+    this.pageChangeDuration = const Duration(milliseconds: 400),
   });
 
   final Duration longPressDelay;
@@ -41,6 +44,17 @@ class FlexiBoardPhysics {
   /// When snapped to a cross-board target, pin the floating card to the
   /// placeholder slot rather than the finger.
   final bool snapFeedbackToPlaceholder;
+
+  /// Horizontal inset used by [FlexiBoardLayout.paged] to compute
+  /// `PageController.viewportFraction` (side peek of neighboring columns).
+  final double pageSideMargin;
+
+  /// Distance from the left/right edge that triggers a page change while
+  /// dragging in [FlexiBoardLayout.paged].
+  final double pageEdgeExtent;
+
+  /// Duration for animated page changes in [FlexiBoardLayout.paged].
+  final Duration pageChangeDuration;
 
   static const FlexiBoardPhysics standard = FlexiBoardPhysics();
 

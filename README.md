@@ -5,7 +5,7 @@ Plug-and-play **multi-board drag-and-drop** for Flutter.
 ![FlexiBoard example on iOS](doc/flexiboard_example.png)
 
 - **Mechanism first** — drag physics, placeholders, edge auto-scroll, typed move events
-- **1..N boards** — single board, tab switcher (hover-to-switch while dragging), or side-by-side
+- **1..N boards** — single board, tab switcher (hover-to-switch while dragging), side-by-side, or paged columns
 - **Fully customizable cards** via builders — or use the built-in default UI
 - **Flutter-only** — no Provider, Riverpod, GetIt, or design-system lock-in
 - **Optional** WIP limits, undo/redo controller, swimlanes
@@ -73,9 +73,28 @@ FlexiBoard<Task>(
 
 | Layout | Behavior |
 |---|---|
-| `FlexiBoardLayout.single` | One board canvas |
+| `FlexiBoardLayout.single` | One board canvas (horizontal scroll of columns) |
 | `FlexiBoardLayout.tabs` | Tab strip; drag over a tab to switch boards, then drop |
 | `FlexiBoardLayout.sideBySide` | Multiple boards visible; drag across boards |
+| `FlexiBoardLayout.paged` | One column per page with side peek; drag near edges to change page |
+
+### Paged columns (BoardView-style)
+
+```dart
+FlexiBoard(
+  layout: FlexiBoardLayout.paged,
+  activeColumnId: currentColumnId,
+  onActiveColumnChanged: (columnId) {
+    setState(() => currentColumnId = columnId);
+  },
+  physics: const FlexiBoardPhysics(
+    pageSideMargin: 16,
+    pageEdgeExtent: 80,
+    pageChangeDuration: Duration(milliseconds: 400),
+  ),
+  ...
+);
+```
 
 ## Snappy cross-board drag
 
@@ -110,4 +129,4 @@ Set `wipLimit` on a column to enforce capacity when WIP is enabled.
 cd example && flutter run
 ```
 
-Long-press a card to drag. Use **One / Tabs / Split** to switch layouts, and the sparkle control to toggle custom cards.
+Long-press a card to drag. Use **One / Tabs / Split / Paged** to switch layouts, and the sparkle control to toggle custom cards.

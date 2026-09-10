@@ -17,6 +17,7 @@ class BoardColumnView<T> extends StatefulWidget {
     required this.cards,
     this.columnIndex = 0,
     this.swimlaneId,
+    this.expandHorizontally = false,
   });
 
   final String boardId;
@@ -24,6 +25,9 @@ class BoardColumnView<T> extends StatefulWidget {
   final List<FlexiBoardCard<T>> cards;
   final int columnIndex;
   final String? swimlaneId;
+
+  /// When true (paged layout), fill the PageView slot instead of fixed width.
+  final bool expandHorizontally;
 
   @override
   BoardColumnViewState<T> createState() => BoardColumnViewState<T>();
@@ -222,8 +226,10 @@ class BoardColumnViewState<T> extends State<BoardColumnView<T>> {
             session.hoverIndex != null;
 
         return Container(
-          width: scope.physics.columnWidth,
-          margin: EdgeInsets.only(right: scope.physics.columnSpacing),
+          width: widget.expandHorizontally ? null : scope.physics.columnWidth,
+          margin: widget.expandHorizontally
+              ? EdgeInsets.zero
+              : EdgeInsets.only(right: scope.physics.columnSpacing),
           decoration: BoxDecoration(
             color: theme.columnBackgroundColor ?? scheme.surfaceContainerLow,
             borderRadius: BorderRadius.circular(theme.columnBorderRadius),
