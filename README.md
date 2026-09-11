@@ -21,6 +21,27 @@ dependencies:
 flutter pub add flexi_board
 ```
 
+## AI agents
+
+This package ships [Agent Skills](https://agentskills.io) so coding assistants
+use the real FlexiBoard APIs instead of guessing.
+
+After adding the dependency:
+
+```bash
+dart run skills@ get
+```
+
+Non-interactive: `dart run skills@ get --all`.
+
+| Skill | Use when |
+|---|---|
+| `flexi-board-integrate` | Adding the widget, controller vs host-owned state, custom cards |
+| `flexi-board-layouts` | Layouts, physics, paged columns, `columnListWrapper` |
+| `flexi-board-policies` | WIP limits, `canStartDrag` / `canAcceptDrop`, undo |
+
+See [`llms.txt`](llms.txt) for an LLM index and [`AGENTS.md`](AGENTS.md) if you
+are working in this repository.
 
 ## Quick start (defaults)
 

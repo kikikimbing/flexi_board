@@ -1,4 +1,5 @@
 # Keep the published archive lean; example still ships source + assets fonts.
+.agents/
 example/ios/
 example/.idea/
 example/*.iml

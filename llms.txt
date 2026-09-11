@@ -1,0 +1,33 @@
+# FlexiBoard
+
+> Plug-and-play multi-board drag-and-drop for Flutter (Dart). Mechanism-first physics, optional default UI, 1..N boards, WIP, undo. MIT license. Package name: `flexi_board`.
+
+Install: `flutter pub add flexi_board`. Public import: `package:flexi_board/flexi_board.dart`. Provide `FlexiBoardController` **or** `FlexiBoardWorkspace`. Card payload is generic `T`. Flutter-only — no required state-management package.
+
+Consumer coding agents: after depending on this package, run `dart run skills@ get` (or `dart run skills@ get --all`) to install the skills below.
+
+## Docs
+
+- [README](https://github.com/kikikimbing/flexi_board/blob/master/README.md): Human quick start, layouts, policies, examples
+- [AGENTS.md](https://github.com/kikikimbing/flexi_board/blob/master/AGENTS.md): Instructions for agents working in this repository
+- [CHANGELOG](https://github.com/kikikimbing/flexi_board/blob/master/CHANGELOG.md): Version history
+- [pub.dev](https://pub.dev/packages/flexi_board): Published package
+- [API library barrel](https://github.com/kikikimbing/flexi_board/blob/master/lib/flexi_board.dart): Public exports
+
+## Package skills
+
+- [flexi-board-integrate](https://github.com/kikikimbing/flexi_board/blob/master/skills/flexi-board-integrate/SKILL.md): Add FlexiBoard, controller vs host-owned state, custom cards, applyMove
+- [flexi-board-integrate API](https://github.com/kikikimbing/flexi_board/blob/master/skills/flexi-board-integrate/references/api.md): Public type cheat sheet
+- [flexi-board-layouts](https://github.com/kikikimbing/flexi_board/blob/master/skills/flexi-board-layouts/SKILL.md): single / tabs / sideBySide / paged, physics, columnListWrapper
+- [flexi-board-policies](https://github.com/kikikimbing/flexi_board/blob/master/skills/flexi-board-policies/SKILL.md): WIP, canStartDrag vs canAcceptDrop, undo/redo
+
+## Examples
+
+- [Example app](https://github.com/kikikimbing/flexi_board/blob/master/example/lib/main.dart): Layouts, custom cards, controller
+- [Model tests](https://github.com/kikikimbing/flexi_board/blob/master/test/flexi_board_test.dart): applyMove, WIP
+- [Widget tests](https://github.com/kikikimbing/flexi_board/blob/master/test/flexi_board_widget_test.dart): layouts and builders
+
+## Optional
+
+- [Maintainer skill](https://github.com/kikikimbing/flexi_board/blob/master/.agents/skills/flexi-board-maintain/SKILL.md): Changing this package (not published to consumers)
+- [Example screenshot](https://github.com/kikikimbing/flexi_board/blob/master/doc/flexiboard_example.png)
