@@ -1,3 +1,9 @@
+## 0.4.1
+
+* Ship Agent Skills under `skills/` so coding agents can install FlexiBoard
+  guidance with `dart run skills@ get`.
+* Add `AGENTS.md` and `llms.txt` for repository agents and LLM discovery.
+
 ## 0.4.0
 
 * Add `columnListWrapper` so hosts can wrap each column’s vertical ListView

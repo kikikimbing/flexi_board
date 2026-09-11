@@ -3,7 +3,7 @@ description: >-
   Plug-and-play multi-board drag-and-drop for Flutter. Mechanism-first physics
   with optional default UI, 1..N boards, cross-board moves, WIP, and undo —
   flutter-only, state-management agnostic.
-version: 0.4.0
+version: 0.4.1
 homepage: https://github.com/kikikimbing/flexi_board
 repository: https://github.com/kikikimbing/flexi_board
 issue_tracker: https://github.com/kikikimbing/flexi_board/issues
